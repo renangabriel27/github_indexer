@@ -1,44 +1,43 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
-ruby '4.0.1'
-gem 'rails', '~> 8.1.2'
-gem 'bootsnap', require: false
-gem 'pg', '~> 1.5'
-gem 'puma', '>= 5.0'
-gem 'propshaft'
+ruby "4.0.1"
+gem "rails", "~> 8.1.2"
+gem "bootsnap", require: false
+gem "pg", "~> 1.5"
+gem "puma", ">= 5.0"
+gem "propshaft"
 
 # Frontend
-gem 'tailwindcss-rails'
-gem 'view_component'
+gem "tailwindcss-rails"
+gem "view_component"
 
 # Scraping
-gem 'nokogiri'
-gem 'httparty'
+gem "nokogiri"
+gem "httparty"
 
 # Background Jobs
-gem 'sidekiq'
+gem "sidekiq"
 
 # API
-gem 'blueprinter'
-gem 'pagy'
+gem "blueprinter"
+gem "pagy"
 
 # Utilities
-gem 'dry-monads'
+gem "dry-monads"
 
 group :development, :test do
-  gem 'rspec-rails'
-  gem 'factory_bot_rails'
-  gem 'faker'
-  gem 'byebug'
-  gem 'rubocop-rails', require: false
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem "faker"
+  gem "byebug"
+  gem "rubocop-rails-omakase", require: false
 end
 
 group :test do
-  gem 'webmock'
-  gem 'shoulda-matchers'
-  gem 'simplecov', require: false
-  gem 'capybara'
-  gem 'selenium-webdriver'
-  gem 'database_cleaner-active_record'
+  gem "webmock"
+  gem "shoulda-matchers"
+  gem "simplecov", require: false
+  gem "capybara"
+  gem "selenium-webdriver"
+  gem "database_cleaner-active_record"
 end
-
