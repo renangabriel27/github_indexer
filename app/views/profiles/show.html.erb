@@ -1,0 +1,35 @@
+<div class="max-w-4xl mx-auto">
+  <div class="card">
+    <%= image_tag @profile.avatar_url, class: "w-24 h-24 rounded-full" if @profile.avatar_url %>
+    <h1 class="text-3xl font-bold mt-4"><%= @profile.name %></h1>
+    <p class="text-gray-600"><%= @profile.github_username %></p>
+
+    <div class="grid grid-cols-3 gap-4 mt-6">
+      <div class="text-center">
+        <p class="text-2xl font-bold"><%= @profile.followers %></p>
+        <p class="text-gray-600">Followers</p>
+      </div>
+      <div class="text-center">
+        <p class="text-2xl font-bold"><%= @profile.following %></p>
+        <p class="text-gray-600">Following</p>
+      </div>
+      <div class="text-center">
+        <p class="text-2xl font-bold"><%= @profile.stars %></p>
+        <p class="text-gray-600">Stars</p>
+      </div>
+    </div>
+
+    <% if @profile.full_short_url %>
+      <div class="mt-6">
+        <label class="block text-sm font-medium">URL Curta</label>
+        <input type="text" value="<%= @profile.full_short_url %>" readonly class="input mt-1">
+      </div>
+    <% end %>
+
+    <div class="mt-6 flex gap-3">
+      <%= button_to "Re-escanear", rescan_profile_path(@profile), class: "btn-primary" %>
+      <%= link_to "Editar", edit_profile_path(@profile), class: "btn-secondary" %>
+      <%= button_to "Remover", @profile, method: :delete, data: { confirm: "Confirma?" }, class: "btn-danger" %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,6 @@
+<%= form_with url: profiles_path, method: :get, class: "mb-8" do |f| %>
+  <%= f.search_field :q,
+      value: params[:q],
+      placeholder: "Buscar...",
+      class: "w-full rounded-lg border px-4 py-3" %>
+<% end %>

@@ -1,0 +1,23 @@
+<%= form_with model: profile, class: "card" do |f| %>
+  <% if profile.errors.any? %>
+    <div class="alert-danger mb-4">
+      <ul>
+        <% profile.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-4">
+    <%= f.label :name, class: "label" %>
+    <%= f.text_field :name, class: "input" %>
+  </div>
+
+  <div class="mb-6">
+    <%= f.label :github_url, "URL do GitHub", class: "label" %>
+    <%= f.url_field :github_url, placeholder: "https://github.com/username", class: "input" %>
+  </div>
+
+  <%= f.submit "Salvar", class: "btn-primary" %>
+<% end %>
