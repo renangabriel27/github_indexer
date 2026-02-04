@@ -38,5 +38,7 @@ group :test do
   gem 'shoulda-matchers'
   gem 'simplecov', require: false
   gem 'capybara'
+  gem 'selenium-webdriver'
+  gem 'database_cleaner-active_record'
 end
 
