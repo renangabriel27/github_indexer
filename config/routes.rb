@@ -1,9 +1,9 @@
-require 'sidekiq/web'
+require "sidekiq/web"
 
 Rails.application.routes.draw do
   mount Sidekiq::Web => "/sidekiq"
 
-  root 'profiles#index'
+  root "profiles#index"
 
   resources :profiles do
     member do
@@ -12,6 +12,6 @@ Rails.application.routes.draw do
   end
 
   namespace :api do
-    resources :profiles, only: [:index, :show]
+    resources :profiles, only: [ :index, :show ]
   end
 end

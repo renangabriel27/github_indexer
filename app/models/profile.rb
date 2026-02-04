@@ -8,10 +8,10 @@ class Profile < ApplicationRecord
   before_validation :normalize_github_url
 
   enum :scraping_status, {
-    pending: 'pending',
-    processing: 'processing',
-    completed: 'completed',
-    failed: 'failed'
+    pending: "pending",
+    processing: "processing",
+    completed: "completed",
+    failed: "failed"
   }
 
   scope :search, ->(q) {
@@ -28,7 +28,7 @@ class Profile < ApplicationRecord
   def normalize_github_url
     return if github_url.blank?
     self.github_url = github_url.strip
-                                .sub(%r{\Agithub\.com}, 'https://github.com')
-                                .sub(%r{/+\z}, '')
+                                .sub(%r{\Agithub\.com}, "https://github.com")
+                                .sub(%r{/+\z}, "")
   end
 end

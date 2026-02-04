@@ -1,7 +1,7 @@
 module Profiles
   class ScraperService < ApplicationService
     GITHUB_HEADERS = {
-      'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }.freeze
 
     def initialize(profile)
@@ -57,14 +57,14 @@ module Profiles
 
     def extract_username(doc)
       username = doc.at_css('[itemprop="additionalName"]')&.text&.strip
-      username || doc.at_css('.vcard-username')&.text&.strip
+      username || doc.at_css(".vcard-username")&.text&.strip
     end
 
     def extract_followers(doc)
       link = doc.at_css('a[href*="tab=followers"]')
       return 0 unless link
 
-      number_text = link.at_css('.text-bold')&.text&.strip
+      number_text = link.at_css(".text-bold")&.text&.strip
       parse_number(number_text)
     end
 
@@ -72,7 +72,7 @@ module Profiles
       link = doc.at_css('a[href*="tab=following"]')
       return 0 unless link
 
-      number_text = link.at_css('.text-bold')&.text&.strip
+      number_text = link.at_css(".text-bold")&.text&.strip
       parse_number(number_text)
     end
 
@@ -87,19 +87,19 @@ module Profiles
     end
 
     def extract_contributions(doc)
-      node = doc.at_css('h2#js-contribution-activity-description')
+      node = doc.at_css("h2#js-contribution-activity-description")
       return 0 unless node
 
-      text = node.text.gsub(/\s+/, ' ').strip
+      text = node.text.gsub(/\s+/, " ").strip
       number = text[/[\d,.]+/]
 
       return 0 unless number
-      number.delete('.,').to_i
+      number.delete(".,").to_i
     end
 
     def extract_avatar(doc)
-      avatar = doc.at_css('.avatar-user')&.[]('src')
-      avatar ||= doc.at_css('meta[property="og:image"]')&.[]('content')
+      avatar = doc.at_css(".avatar-user")&.[]("src")
+      avatar ||= doc.at_css('meta[property="og:image"]')&.[]("content")
 
       normalize_url(avatar)
     end
@@ -107,15 +107,15 @@ module Profiles
     def extract_location(doc)
       location_item = doc.at_css('[itemprop="homeLocation"]')
       return nil unless location_item
-      location_item.at_css('.p-label')&.text&.strip
+      location_item.at_css(".p-label")&.text&.strip
     end
 
     def extract_organizations(doc)
       orgs = []
 
       doc.css('a[itemprop="follows"]').each do |org_link|
-        org_name = org_link['aria-label']
-        org_name ||= org_link.at_css('img')&.[]('alt')&.sub('@', '')
+        org_name = org_link["aria-label"]
+        org_name ||= org_link.at_css("img")&.[]("alt")&.sub("@", "")
 
         orgs << org_name if org_name.present?
       end
@@ -126,22 +126,22 @@ module Profiles
     def parse_number(text)
       return 0 if text.blank?
 
-      clean_text = text.gsub(/[,\s]/, '')
+      clean_text = text.gsub(/[,\s]/, "")
 
       multiplier = case clean_text.downcase
-                   when /k$/i then 1_000
-                   when /m$/i then 1_000_000
-                   else 1
-                   end
+      when /k$/i then 1_000
+      when /m$/i then 1_000_000
+      else 1
+      end
 
-      number = clean_text.gsub(/[^\d.]/, '').to_f
+      number = clean_text.gsub(/[^\d.]/, "").to_f
       (number * multiplier).to_i
     end
 
     def normalize_url(url)
       return nil if url.blank?
-      return url if url.start_with?('http')
-      return "https:#{url}" if url.start_with?('//')
+      return url if url.start_with?("http")
+      return "https:#{url}" if url.start_with?("//")
 
       "https://github.com#{url}"
     end

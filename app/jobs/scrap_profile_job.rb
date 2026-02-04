@@ -6,6 +6,6 @@ class ScrapProfileJob < ApplicationJob
     profile = Profile.find(profile_id)
 
     result = Profiles::ScraperService.call(profile)
-    return unless result.success?
+    nil unless result.success?
   end
 end
