@@ -8,6 +8,8 @@ class Profile < ApplicationRecord
     failed: "failed"
   }
 
+  attr_accessor :github_url
+
   scope :search, ->(q) {
     return all if q.blank?
     where("name ILIKE :q OR github_username ILIKE :q OR location ILIKE :q", q: "%#{q}%")

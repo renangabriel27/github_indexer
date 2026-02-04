@@ -13,10 +13,10 @@ class ProfilesController < ApplicationController
   end
 
   def create
-    @profile = Profile.new(profile_params)
+    result = Profiles::CreatorService.new(profile_params).call
 
-    if @profile.save
-      redirect_to @profile, notice: "Perfil criado!"
+    if result.success?
+      redirect_to result.value!, notice: "Perfil criado!"
     else
       render :new, status: :unprocessable_entity
     end
