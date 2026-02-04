@@ -25,6 +25,9 @@ gem "pagy"
 # Utilities
 gem "dry-monads"
 
+# Rate limiting
+gem "rack-attack"
+
 group :development, :test do
   gem "rspec-rails"
   gem "factory_bot_rails"
