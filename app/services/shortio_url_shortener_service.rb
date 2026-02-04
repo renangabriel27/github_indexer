@@ -12,19 +12,12 @@ class ShortioUrlShortenerService
   end
 
   def call
-    validate_config!
-
-    result = shorten_with_retry
-    parse_response(result)
+    parse_response(shorten_with_retry)
   rescue StandardError => e
     handle_error(e)
   end
 
   private
-
-  def validate_config!
-    raise 'SHORTIO_API_KEY not configured' if @api_key.blank?
-  end
 
   def shorten_with_retry
     retries = 0

@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :profile do
     name { Faker::Name.name }
     github_username { Faker::Internet.username(specifier: 4..15) }
-    short_github_url { "https://app.test/g/#{SecureRandom.alphanumeric(6)}" }
+    short_github_url { "https://githu.short.gy/#{SecureRandom.alphanumeric(6)}" }
     followers { Faker::Number.between(from: 0, to: 50_000) }
     following { Faker::Number.between(from: 0, to: 1_000) }
     stars { Faker::Number.between(from: 0, to: 10_000) }

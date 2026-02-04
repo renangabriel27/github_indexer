@@ -11,7 +11,9 @@ Rails.application.routes.draw do
     end
   end
 
-  namespace :api do
-    resources :profiles, only: [ :index, :show ]
+  namespace :api, defaults: { format: :json } do
+    namespace :v1 do
+      resources :profiles, only: [ :index, :show ]
+    end
   end
 end
