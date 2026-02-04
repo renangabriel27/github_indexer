@@ -31,6 +31,7 @@ group :development, :test do
   gem "faker"
   gem "byebug"
   gem "rubocop-rails-omakase", require: false
+  gem "dotenv-rails"
 end
 
 group :test do
