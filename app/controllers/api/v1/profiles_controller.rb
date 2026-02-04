@@ -37,7 +37,7 @@ module Api::V1
 
     def per_page
       requested = params[:per_page].to_i
-      requested.positive? ? [requested, 100].min : 10
+      requested.positive? ? [ requested, 100 ].min : 10
     end
 
     def pagination_meta(pagy)

@@ -8,8 +8,4 @@ class ProfileSerializer < Blueprinter::Base
   field :organizations do |profile|
     profile.organizations || []
   end
-
-  field :created_at do |profile|
-    profile.created_at.iso8601
-  end
 end

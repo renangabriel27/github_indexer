@@ -3,7 +3,7 @@ module Api::V1
     include Pagy::Method
 
     rescue_from ActiveRecord::RecordNotFound do
-      render json: { error: 'Not found' }, status: :not_found
+      render json: { error: "Not found" }, status: :not_found
     end
   end
 end
