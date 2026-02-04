@@ -20,7 +20,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_04_011900) do
     t.datetime "created_at", null: false
     t.integer "followers", default: 0
     t.integer "following", default: 0
-    t.string "github_url", null: false
     t.string "github_username"
     t.text "last_error"
     t.datetime "last_scanned_at"
@@ -31,7 +30,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_04_011900) do
     t.string "short_github_url"
     t.integer "stars", default: 0
     t.datetime "updated_at", null: false
-    t.index ["github_url"], name: "index_profiles_on_github_url", unique: true
     t.index ["github_username"], name: "index_profiles_on_github_username"
+    t.index ["short_github_url"], name: "index_profiles_on_short_github_url", unique: true
   end
 end

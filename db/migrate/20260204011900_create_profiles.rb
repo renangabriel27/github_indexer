@@ -2,7 +2,6 @@ class CreateProfiles < ActiveRecord::Migration[8.1]
   def change
     create_table :profiles do |t|
       t.string :name, null: false
-      t.string :github_url, null: false
       t.string :short_github_url
       t.string :github_username
       t.integer :followers, default: 0
@@ -19,7 +18,7 @@ class CreateProfiles < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :profiles, :github_url, unique: true
+    add_index :profiles, :short_github_url, unique: true
     add_index :profiles, :github_username
   end
 end

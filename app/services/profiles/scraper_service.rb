@@ -4,8 +4,9 @@ module Profiles
       "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }.freeze
 
-    def initialize(profile)
+    def initialize(profile, github_url)
       @profile = profile
+      @github_url = github_url
     end
 
     def call
@@ -34,9 +35,9 @@ module Profiles
     private
 
     def fetch_github_page
-      HTTParty.get(@profile.github_url, headers: GITHUB_HEADERS, timeout: 15)
+      HTTParty.get(@github_url, headers: GITHUB_HEADERS, timeout: 15)
     rescue Net::OpenTimeout, Net::ReadTimeout => e
-      Rails.logger.error("Timeout fetching #{@profile.github_url}: #{e.message}")
+      Rails.logger.error("Timeout fetching #{@github_url}: #{e.message}")
       nil
     end
 
