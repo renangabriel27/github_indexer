@@ -19,13 +19,6 @@
       </div>
     </div>
 
-    <% if @profile.full_short_url %>
-      <div class="mt-6">
-        <label class="block text-sm font-medium">URL Curta</label>
-        <input type="text" value="<%= @profile.full_short_url %>" readonly class="input mt-1">
-      </div>
-    <% end %>
-
     <div class="mt-6 flex gap-3">
       <%= button_to "Re-escanear", rescan_profile_path(@profile), class: "btn-primary" %>
       <%= link_to "Editar", edit_profile_path(@profile), class: "btn-secondary" %>
