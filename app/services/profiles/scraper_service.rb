@@ -13,15 +13,22 @@ module Profiles
 
     def call
       @profile.update(scraping_status: :processing)
-      # return Failure("Failed to fetch GitHub page") unless response&.success?
       Success(fetch_profile_with_js)
-    rescue StandardError => e
+    rescue ProfileNotFoundError => e
       @profile.update(
         scraping_status: :failed,
-        last_error: e.message,
+        last_error: "Perfil não encontrado",
         last_scanned_at: Time.current
       )
       Failure(e.message)
+    rescue StandardError => e
+      error_message = standardize_error_message(e)
+      @profile.update(
+        scraping_status: :failed,
+        last_error: error_message,
+        last_scanned_at: Time.current
+      )
+      Failure(error_message)
     end
 
     private
@@ -30,6 +37,8 @@ module Profiles
       @browser = setup_browser
 
       @browser.go_to(@github_url)
+
+      check_http_status
       wait_for_contributions
 
       html = @browser.body
@@ -59,7 +68,11 @@ module Profiles
     end
 
     def wait_for_contributions
-      wait_for_element(@browser, 'h2[id*="contribution"]', timeout: 10)
+      found = wait_for_element(@browser, 'h2[id*="contribution"]', timeout: 10)
+      unless found
+        Rails.logger.warn("Contribuições não carregadas a tempo para #{@profile.github_username}, continuando parsing...")
+      end
+      found
     end
 
     def parse_page(html)
@@ -188,5 +201,62 @@ module Profiles
 
       "https://github.com#{url}"
     end
+
+    def check_http_status
+      begin
+        status = @browser.status if @browser.respond_to?(:status)
+
+        if status == 404
+          raise ProfileNotFoundError, "Perfil não encontrado (404)"
+        elsif status && status >= 400
+          raise StandardError, "Erro HTTP #{status} ao acessar perfil"
+        end
+      rescue NoMethodError
+      end
+
+      html = @browser.body
+
+      title = @browser.at_css("title")&.text&.downcase || ""
+      if title.include?("404") || title.include?("not found")
+        raise ProfileNotFoundError, "Perfil não encontrado"
+      end
+
+      has_profile_elements = html.include?("vcard-username") ||
+                            html.include?("avatar-user") ||
+                            html.include?("p-name") ||
+                            html.include?("itemprop=\"name\"")
+
+      unless has_profile_elements
+        error_indicators = [
+          /this is not the web page you are looking for/i,
+          /there isn't a github pages site here/i,
+          /page not found/i,
+          /404.*not found/i
+        ]
+
+        if error_indicators.any? { |pattern| html.match?(pattern) }
+          raise ProfileNotFoundError, "Perfil não encontrado"
+        end
+      end
+    end
+
+    def standardize_error_message(error)
+      error_msg = error.message.to_s
+
+      case error_msg
+      when /404|not found|não encontrado/i
+        "Perfil não encontrado"
+      when /timeout|timed out/i
+        "Timeout ao carregar página do GitHub"
+      when /network|connection|conexão/i
+        "Erro de conexão com GitHub"
+      when /ferrum|browser/i
+        "Erro ao inicializar navegador"
+      else
+        "Erro ao processar perfil: #{error_msg}"
+      end
+    end
   end
+
+  class ProfileNotFoundError < StandardError; end
 end
