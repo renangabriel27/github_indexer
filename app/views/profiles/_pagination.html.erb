@@ -1,22 +1,97 @@
-<%#
-  Custom pagination partial for Pagy with Tailwind CSS.
-  This partial assumes the 'pagy' object is passed in as a local variable.
-%>
+<nav class="mt-12">
+  <div class="flex flex-col items-center gap-4">
+    <!-- Pagination Controls - sempre mostra quando há mais de 1 página -->
+    <% if pagy.pages > 1 %>
+      <div class="flex items-center justify-center gap-6">
+        <!-- Previous Button -->
+        <% prev_page = pagy.page > 1 ? pagy.page - 1 : nil %>
+        <% if prev_page %>
+          <%= link_to profiles_path(request.query_parameters.merge(page: prev_page)), 
+              class: "group relative inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20 mr-2",
+              data: { turbo_frame: "profiles" } do %>
+            <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Anterior</span>
+          <% end %>
+        <% else %>
+          <span class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 border border-slate-800 rounded-xl text-gray-500 cursor-not-allowed mr-2">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Anterior</span>
+          </span>
+        <% end %>
 
-<% if pagy.pages > 1 %>
-  <nav class="flex items-center justify-between px-4 py-3 sm:px-6">
-    <div class="flex-1 flex justify-between sm:justify-end">
-      <% if pagy.prev %>
-        <%= link_to 'Anterior', pagy_url_for(pagy, pagy.prev), class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
-      <% else %>
-        <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 bg-white cursor-not-allowed">Anterior</span>
-      <% end %>
+        <!-- Page Numbers -->
+        <div class="flex items-center gap-4 mx-2">
+          <% 
+            # Gerar série de páginas manualmente
+            current_page = pagy.page
+            total_pages = pagy.pages
+            series = []
+            
+            if total_pages <= 7
+              # Mostrar todas as páginas se houver 7 ou menos
+              (1..total_pages).each { |p| series << p }
+            else
+              # Lógica para muitas páginas
+              if current_page <= 3
+                # Perto do início
+                (1..4).each { |p| series << p }
+                series << "..."
+                series << total_pages
+              elsif current_page >= total_pages - 2
+                # Perto do fim
+                series << 1
+                series << "..."
+                ((total_pages - 3)..total_pages).each { |p| series << p }
+              else
+                # No meio
+                series << 1
+                series << "..."
+                ((current_page - 1)..(current_page + 1)).each { |p| series << p }
+                series << "..."
+                series << total_pages
+              end
+            end
+            
+            series.each do |item|
+              if item == "..."
+          %>
+            <span class="px-3 py-2.5 text-gray-500 text-sm">…</span>
+          <%    elsif item == current_page %>
+            <span class="relative px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white font-semibold text-sm shadow-lg shadow-indigo-500/50">
+              <%= item %>
+            </span>
+          <%    else %>
+            <%= link_to item, profiles_path(request.query_parameters.merge(page: item)), 
+                class: "px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium text-sm transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20",
+                data: { turbo_frame: "profiles" } %>
+          <%    end %>
+          <% end %>
+        </div>
 
-      <% if pagy.next %>
-        <%= link_to 'Próxima', pagy_url_for(pagy, pagy.next), class: "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
-      <% else %>
-        <span class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 bg-white cursor-not-allowed">Próxima</span>
-      <% end %>
-    </div>
-  </nav>
-<% end %>
+        <!-- Next Button -->
+        <% next_page = pagy.page < pagy.pages ? pagy.page + 1 : nil %>
+        <% if next_page %>
+          <%= link_to profiles_path(request.query_parameters.merge(page: next_page)), 
+              class: "group relative inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20 ml-2",
+              data: { turbo_frame: "profiles" } do %>
+            <span>Próxima</span>
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          <% end %>
+        <% else %>
+          <span class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 border border-slate-800 rounded-xl text-gray-500 cursor-not-allowed ml-2">
+            <span>Próxima</span>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</nav>

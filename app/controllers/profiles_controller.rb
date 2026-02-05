@@ -2,7 +2,12 @@ class ProfilesController < ApplicationController
   before_action :set_profile, only: [ :show, :edit, :update, :destroy, :rescan ]
 
   def index
-    @pagy, @profiles = pagy(Profile.search(params[:q]).order(created_at: :desc), items: 12)
+    profiles = Profile.all
+    search_query = params[:q]
+    profiles = profiles.search(search_query) if search_query.present?
+    profiles = profiles.order(created_at: :desc)
+    
+    @pagy, @profiles = pagy(:offset, profiles, offset: calculate_offset, limit: per_page)
   end
 
   def show
@@ -48,6 +53,20 @@ class ProfilesController < ApplicationController
   end
 
   private
+
+  def calculate_offset
+    return params[:offset].to_i if params[:offset].present?
+
+    page = params[:page].to_i
+    page = 1 if page < 1
+
+    (page - 1) * per_page
+  end
+
+  def per_page
+    requested = params[:per_page].to_i
+    requested.positive? ? [ requested, 100 ].min : 12
+  end
 
   def set_profile
     @profile = Profile.find(params[:id])
