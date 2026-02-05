@@ -1,6 +1,7 @@
 class UrlShortenerJob < ApplicationJob
   queue_as :default
-  retry_on StandardError, attempts: 3
+
+  sidekiq_options retry: false
 
   def perform(profile_id)
     profile = Profile.find(profile_id)
@@ -11,6 +12,6 @@ class UrlShortenerJob < ApplicationJob
     service = ShortioUrlShortenerService.new(github_url)
     short_github_url = service.call[:short_url]
 
-    profile.update(short_github_url: short_github_url)
+    profile.update_columns(short_github_url: short_github_url)
   end
 end

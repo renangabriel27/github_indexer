@@ -5,9 +5,10 @@ module Profiles
       "Accept-Language" => "en-US,en;q=0.9"
     }.freeze
 
-    def initialize(profile)
+    def initialize(profile, update_name: false)
       @profile = profile
       @github_url = "https://www.github.com/#{profile.github_username}"
+      @update_name = update_name
     end
 
     def call
@@ -16,8 +17,10 @@ module Profiles
       response = fetch_github_page
       return Failure("Failed to fetch GitHub page") unless response&.success?
 
-      data = parse_page(response.body)
-      @profile.update!(data.merge(
+      parsed_data = parse_page(response.body)
+      parsed_data.delete(:name) unless @update_name
+
+      @profile.update!(parsed_data.merge(
         scraping_status: :completed,
         last_scanned_at: Time.current,
         last_error: nil
@@ -46,6 +49,7 @@ module Profiles
       doc = Nokogiri::HTML(html)
 
       {
+        name: extract_name(doc),
         github_username: extract_username(doc),
         followers: extract_followers(doc),
         following: extract_following(doc),
@@ -55,6 +59,11 @@ module Profiles
         location: extract_location(doc),
         organizations: extract_organizations(doc)
       }
+    end
+
+    def extract_name(doc)
+      name = doc.at_css('[itemprop="name"]')&.text&.strip
+      name || doc.at_css('.p-name')&.text&.strip
     end
 
     def extract_username(doc)

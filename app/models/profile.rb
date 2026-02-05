@@ -18,8 +18,8 @@ class Profile < ApplicationRecord
   before_validation :normalize_github_username
   before_save :reset_scraping_data, if: :github_username_changed?
 
-  after_create_commit :enqueue_scraper, :set_short_github_url
-  after_update_commit :enqueue_scraper_if_username_changed
+  after_create :enqueue_priority_jobs
+  after_update_commit :enqueue_priority_jobs
 
   enum :scraping_status, {
     pending: "pending",
@@ -56,18 +56,18 @@ class Profile < ApplicationRecord
     end
   end
 
-  def enqueue_scraper
-    return unless self.can_rescan?
-    ScrapProfileJob.perform_later(self.id)
+  def enqueue_priority_jobs
+    return unless previously_new_record? || can_rescan?
+    enqueue_github_scraper
+    enqueue_github_shortener_url
   end
 
-  def enqueue_scraper_if_username_changed
-    return unless self.can_rescan?
-    ScrapProfileJob.perform_later(id) if saved_change_to_github_username?
+  def enqueue_github_scraper
+    update_name = !previously_new_record?
+    GithubScraperJob.perform_later(self.id, update_name: update_name)
   end
 
-  def set_short_github_url
-    return unless github_username.present?
+  def enqueue_github_shortener_url
     UrlShortenerJob.perform_later(self.id)
   end
 
