@@ -7,7 +7,7 @@ module Profiles
 
     def initialize(profile)
       @profile = profile
-      @github_url = "https://www.github.com.br#{profile.github_username}"
+      @github_url = "https://www.github.com/#{profile.github_username}"
     end
 
     def call
