@@ -1,7 +1,9 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
-  mount Sidekiq::Web => "/sidekiq"
+  if Rails.env.development?
+    mount Sidekiq::Web => '/sidekiq'
+  end
 
   root "profiles#index"
 

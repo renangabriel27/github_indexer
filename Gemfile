@@ -16,6 +16,7 @@ gem "httparty"
 
 # Background Jobs
 gem "sidekiq"
+gem "redis"
 
 # API
 gem "blueprinter"

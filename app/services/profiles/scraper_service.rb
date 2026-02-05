@@ -1,12 +1,13 @@
 module Profiles
   class ScraperService < ApplicationService
     GITHUB_HEADERS = {
-      "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+      "Accept-Language" => "en-US,en;q=0.9"
     }.freeze
 
-    def initialize(profile, github_url)
+    def initialize(profile)
       @profile = profile
-      @github_url = github_url
+      @github_url = "https://www.github.com.br#{profile.github_username}"
     end
 
     def call

@@ -13,10 +13,10 @@ class ProfilesController < ApplicationController
   end
 
   def create
-    result = Profiles::CreatorService.new(profile_params).call
+    @profile = Profile.new(profile_params)
 
-    if result.success?
-      redirect_to result.value!, notice: "Perfil criado!"
+    if @profile.save
+      redirect_to @profile, notice: "Perfil criado!"
     else
       render :new, status: :unprocessable_entity
     end
@@ -54,6 +54,6 @@ class ProfilesController < ApplicationController
   end
 
   def profile_params
-    params.require(:profile).permit(:name, :github_url)
+    params.require(:profile).permit(:name, :github_username)
   end
 end
