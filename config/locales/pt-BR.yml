@@ -3,8 +3,17 @@ pt-BR:
     models:
       profile: "Perfil"
     attributes:
-      customer:
-        github_username: "Username"
+      profile:
+        github_username: "Username do Github"
+        name: "Nome"
+        short_github_url: "URl encurtada do Github"
+        followers: "Seguidores"
+        following: "Seguindo"
+        stars: "Stars"
+        contribuitions_last_year: "Contribuições do último ano"
+        avatar_url: "URL da imagem do perfil"
+        location: "Localização"
+        organizations: "Organizações"
     errors:
       messages:
         record_invalid: 'A validação falhou: %{errors}'
