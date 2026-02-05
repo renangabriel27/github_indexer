@@ -3,7 +3,6 @@ class ShortioUrlShortenerService
   base_uri "https://api.short.io/links"
 
   TIMEOUT = 5
-  MAX_RETRIES = 3
 
   def initialize(long_url)
     @long_url = long_url
@@ -20,18 +19,10 @@ class ShortioUrlShortenerService
   private
 
   def shorten_with_retry
-    retries = 0
-
     begin
       make_request
     rescue Net::OpenTimeout, Net::ReadTimeout
-      retries += 1
-      if retries < MAX_RETRIES
-        sleep(2 ** retries) # Backoff: 2s, 4s, 8s
-        retry
-      else
-        raise "Timeout after retries"
-      end
+      raise "Timeout after retries"
     end
   end
 

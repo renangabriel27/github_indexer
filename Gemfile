@@ -12,13 +12,14 @@ gem "view_component"
 
 # Scraping
 gem "nokogiri"
-gem "httparty"
+gem "ferrum"
 
 # Background Jobs
 gem "sidekiq"
 gem "redis"
 
 # API
+gem "httparty"
 gem "blueprinter"
 gem "pagy"
 

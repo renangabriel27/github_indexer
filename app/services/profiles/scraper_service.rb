@@ -13,20 +13,8 @@ module Profiles
 
     def call
       @profile.update(scraping_status: :processing)
-
-      response = fetch_github_page
-      return Failure("Failed to fetch GitHub page") unless response&.success?
-
-      parsed_data = parse_page(response.body)
-      parsed_data.delete(:name) unless @update_name
-
-      @profile.update!(parsed_data.merge(
-        scraping_status: :completed,
-        last_scanned_at: Time.current,
-        last_error: nil
-      ))
-
-      Success(@profile)
+      # return Failure("Failed to fetch GitHub page") unless response&.success?
+      Success(fetch_profile_with_js)
     rescue StandardError => e
       @profile.update(
         scraping_status: :failed,
@@ -38,11 +26,40 @@ module Profiles
 
     private
 
-    def fetch_github_page
-      HTTParty.get(@github_url, headers: GITHUB_HEADERS, timeout: 15)
-    rescue Net::OpenTimeout, Net::ReadTimeout => e
-      Rails.logger.error("Timeout fetching #{@github_url}: #{e.message}")
-      nil
+    def fetch_profile_with_js
+      @browser = setup_browser
+
+      @browser.go_to(@github_url)
+      wait_for_contributions
+
+      html = @browser.body
+      parsed_data = parse_page(html)
+      parsed_data.delete(:name) unless @update_name
+
+      @profile.update!(parsed_data.merge(
+        scraping_status: :completed,
+        last_scanned_at: Time.current,
+        last_error: nil
+      ))
+
+      @profile
+    ensure
+      @browser&.quit
+    end
+
+    def setup_browser
+      Ferrum::Browser.new(
+        headless: true,
+        timeout: 30,
+        browser_options: {
+          'no-sandbox': nil,
+          'disable-dev-shm-usage': nil
+        }
+      )
+    end
+
+    def wait_for_contributions
+      wait_for_element(@browser, 'h2[id*="contribution"]', timeout: 10)
     end
 
     def parse_page(html)
@@ -98,7 +115,7 @@ module Profiles
     end
 
     def extract_contributions(doc)
-      node = doc.at_css("h2#js-contribution-activity-description")
+      node = doc.at_css('h2#js-contribution-activity-description, h2[id*="contribution"]')
       return 0 unless node
 
       text = node.text.gsub(/\s+/, " ").strip
@@ -133,6 +150,20 @@ module Profiles
       end
 
       orgs.uniq
+    end
+
+    def wait_for_element(browser, selector, timeout: 10)
+      elapsed = 0
+      interval = 0.5
+
+      while elapsed < timeout
+        return true if browser.at_css(selector)
+        sleep interval
+        elapsed += interval
+      end
+
+      Rails.logger.warn("Elemento #{selector} não encontrado após #{timeout}s")
+      false
     end
 
     def parse_number(text)

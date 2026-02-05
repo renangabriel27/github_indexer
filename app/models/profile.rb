@@ -19,7 +19,7 @@ class Profile < ApplicationRecord
   before_save :reset_scraping_data, if: :github_username_changed?
 
   after_create :enqueue_priority_jobs
-  after_update_commit :enqueue_priority_jobs
+  after_update_commit :enqueue_priority_jobs, if: :should_enqueue_jobs?
 
   enum :scraping_status, {
     pending: "pending",
@@ -60,6 +60,12 @@ class Profile < ApplicationRecord
     return unless previously_new_record? || can_rescan?
     enqueue_github_scraper
     enqueue_github_shortener_url
+  end
+
+  def should_enqueue_jobs?
+    return false if destroyed?
+    return true if github_username_changed?
+    false
   end
 
   def enqueue_github_scraper
