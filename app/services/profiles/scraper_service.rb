@@ -102,7 +102,8 @@ module Profiles
       avatar = doc.at_css(".avatar-user")&.[]("src")
       avatar ||= doc.at_css('meta[property="og:image"]')&.[]("content")
 
-      normalize_url(avatar)
+      avatar = normalize_url(avatar)
+      avatar&.gsub(/s=64&/, '')
     end
 
     def extract_location(doc)
