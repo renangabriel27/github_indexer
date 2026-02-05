@@ -67,7 +67,7 @@
                                  @profile.scraping_status == 'processing' ? 'bg-blue-500' :
                                  'bg-red-500' %>"></span>
               </span>
-              <%= @profile.scraping_status.capitalize %>
+              <%= t("activerecord.enums.profile.scraping_status.#{@profile.scraping_status}") %>
             </div>
           </div>
         </div>
