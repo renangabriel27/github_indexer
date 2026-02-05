@@ -1,5 +1,86 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 py-12">
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 py-12" data-controller="profile-status-polling" data-profile-status-polling-profile-id-value="<%= @profile.id %>" data-profile-status-polling-status-value="<%= @profile.scraping_status %>">
   <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+
+    <!-- Flash Messages -->
+    <% if notice.present? %>
+      <div class="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-xl flex items-center justify-between flash-message" data-flash-id="notice-<%= SecureRandom.hex(4) %>">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-green-400 font-medium"><%= notice %></p>
+        </div>
+        <button type="button" onclick="dismissFlashMessage(this)" class="text-green-400 hover:text-green-300 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    <% end %>
+
+    <% if alert.present? %>
+      <div class="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl flex items-center justify-between flash-message" data-flash-id="alert-<%= SecureRandom.hex(4) %>">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-yellow-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <p class="text-yellow-400 font-medium"><%= alert %></p>
+        </div>
+        <button type="button" onclick="dismissFlashMessage(this)" class="text-yellow-400 hover:text-yellow-300 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    <% end %>
+
+    <script>
+      function dismissFlashMessage(button) {
+        const flashMessage = button.closest('.flash-message');
+        if (flashMessage) {
+          flashMessage.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+          flashMessage.style.opacity = '0';
+          flashMessage.style.transform = 'translateY(-10px)';
+          setTimeout(function() {
+            if (flashMessage.parentNode) {
+              flashMessage.remove();
+            }
+          }, 300);
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(function(flashMessage) {
+          const timeout = setTimeout(function() {
+            flashMessage.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+            flashMessage.style.opacity = '0';
+            flashMessage.style.transform = 'translateY(-10px)';
+            setTimeout(function() {
+              if (flashMessage.parentNode) {
+                flashMessage.remove();
+              }
+            }, 300);
+          }, 5000);
+          
+          flashMessage.dataset.timeoutId = timeout;
+        });
+      });
+    </script>
+
+    <!-- Processing Banner -->
+    <div id="processing-banner" class="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl flex items-center gap-3 <%= 'hidden' unless @profile.scraping_status == 'processing' %>" data-profile-status-polling-target="processingBanner">
+      <div class="flex items-center gap-3 flex-1">
+        <svg class="w-5 h-5 text-blue-400 flex-shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <div class="flex-1">
+          <p class="text-blue-400 font-medium">Atualizando perfil...</p>
+          <p class="text-blue-300 text-sm mt-1">Aguarde enquanto coletamos as informações mais recentes do GitHub.</p>
+        </div>
+      </div>
+    </div>
 
     <div class="mb-6">
       <%= link_to profiles_path, class: "inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors" do %>
@@ -18,14 +99,21 @@
           <!-- Avatar -->
           <div class="relative group">
             <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full opacity-50 group-hover:opacity-75 transition"></div>
-            <%= image_tag @profile.avatar_url,
-                class: "relative w-32 h-32 rounded-full ring-4 ring-slate-700",
-                alt: @profile.name if @profile.avatar_url %>
+            <% if @profile.avatar_url %>
+              <%= image_tag @profile.avatar_url,
+                  class: "relative w-32 h-32 rounded-full ring-4 ring-slate-700",
+                  alt: @profile.name,
+                  data: { profile_avatar: true } %>
+            <% else %>
+              <div class="relative w-32 h-32 rounded-full ring-4 ring-slate-700 bg-slate-700 flex items-center justify-center" data-profile-avatar-placeholder>
+                <span class="text-4xl text-gray-400"><%= @profile.name.first.upcase %></span>
+              </div>
+            <% end %>
           </div>
 
           <!-- Name and Username -->
           <div class="flex-1 text-center sm:text-left">
-            <h1 class="text-4xl sm:text-5xl font-bold text-white mb-2">
+            <h1 class="text-4xl sm:text-5xl font-bold text-white mb-2" data-profile-name>
               <%= @profile.name %>
             </h1>
 
@@ -38,15 +126,13 @@
                 @<%= @profile.github_username %>
               </a>
 
-              <% if @profile.location.present? %>
-                <span class="inline-flex items-center gap-1.5 text-gray-400">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <%= @profile.location %>
-                </span>
-              <% end %>
+              <span class="inline-flex items-center gap-1.5 text-gray-400 <%= 'hidden' unless @profile.location.present? %>" data-profile-location-container>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span data-profile-location><%= @profile.location %></span>
+              </span>
             </div>
 
             <!-- Status Badge -->
@@ -54,20 +140,23 @@
                         <%= @profile.scraping_status == 'completed' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
                             @profile.scraping_status == 'pending' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
                             @profile.scraping_status == 'processing' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-                            'bg-red-500/20 text-red-400 border border-red-500/30' %>">
+                            'bg-red-500/20 text-red-400 border border-red-500/30' %>"
+                 data-profile-status-badge>
               <span class="relative flex h-2 w-2">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full
                              <%= @profile.scraping_status == 'completed' ? 'bg-green-400' :
                                  @profile.scraping_status == 'pending' ? 'bg-yellow-400' :
                                  @profile.scraping_status == 'processing' ? 'bg-blue-400' :
-                                 'bg-red-400' %> opacity-75"></span>
+                                 'bg-red-400' %> opacity-75"
+                      data-profile-status-ping></span>
                 <span class="relative inline-flex rounded-full h-2 w-2
                              <%= @profile.scraping_status == 'completed' ? 'bg-green-500' :
                                  @profile.scraping_status == 'pending' ? 'bg-yellow-500' :
                                  @profile.scraping_status == 'processing' ? 'bg-blue-500' :
-                                 'bg-red-500' %>"></span>
+                                 'bg-red-500' %>"
+                      data-profile-status-dot></span>
               </span>
-              <%= t("activerecord.enums.profile.scraping_status.#{@profile.scraping_status}") %>
+              <span data-profile-status-text><%= t("activerecord.enums.profile.scraping_status.#{@profile.scraping_status}") %></span>
             </div>
           </div>
         </div>
@@ -80,7 +169,7 @@
           <svg class="w-8 h-8 text-indigo-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <p class="text-3xl font-bold text-white mb-1"><%= number_with_delimiter(@profile.followers) %></p>
+          <p class="text-3xl font-bold text-white mb-1" data-profile-followers><%= number_with_delimiter(@profile.followers) %></p>
           <p class="text-sm text-gray-400">Followers</p>
         </div>
 
@@ -89,7 +178,7 @@
           <svg class="w-8 h-8 text-purple-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
-          <p class="text-3xl font-bold text-white mb-1"><%= number_with_delimiter(@profile.following) %></p>
+          <p class="text-3xl font-bold text-white mb-1" data-profile-following><%= number_with_delimiter(@profile.following) %></p>
           <p class="text-sm text-gray-400">Following</p>
         </div>
 
@@ -98,7 +187,7 @@
           <svg class="w-8 h-8 text-yellow-400 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
           </svg>
-          <p class="text-3xl font-bold text-white mb-1"><%= number_with_delimiter(@profile.stars) %></p>
+          <p class="text-3xl font-bold text-white mb-1" data-profile-stars><%= number_with_delimiter(@profile.stars) %></p>
           <p class="text-sm text-gray-400">Stars</p>
         </div>
 
@@ -107,7 +196,7 @@
           <svg class="w-8 h-8 text-green-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          <p class="text-3xl font-bold text-white mb-1"><%= number_with_delimiter(@profile.contributions_last_year) %></p>
+          <p class="text-3xl font-bold text-white mb-1" data-profile-contributions><%= number_with_delimiter(@profile.contributions_last_year) %></p>
           <p class="text-sm text-gray-400">Contribuições</p>
           <!-- Tooltip -->
           <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
@@ -120,38 +209,36 @@
       </div>
 
       <!-- Organizations (if any) -->
-      <% if @profile.organizations.present? && @profile.organizations.any? %>
-        <div class="p-8 border-b border-slate-700">
-          <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <svg class="w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-            Organizações
-          </h2>
-          <div class="flex flex-wrap gap-3">
+      <div class="p-8 border-b border-slate-700 <%= 'hidden' unless @profile.organizations.present? && @profile.organizations.any? %>" data-profile-organizations-container>
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <svg class="w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          Organizações
+        </h2>
+        <div class="flex flex-wrap gap-3" data-profile-organizations-list>
+          <% if @profile.organizations.present? && @profile.organizations.any? %>
             <% @profile.organizations.each do |org| %>
               <span class="inline-flex items-center gap-2 px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-gray-300 hover:bg-slate-900 hover:border-indigo-500/50 transition-all">
                 <%= org %>
               </span>
             <% end %>
-          </div>
+          <% end %>
         </div>
-      <% end %>
+      </div>
 
       <!-- Additional Info -->
       <div class="p-8 bg-slate-900/30">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-          <% if @profile.last_scanned_at.present? %>
-            <div class="flex items-center gap-3 text-gray-400">
-              <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <p class="text-xs text-gray-500">Último scan</p>
-                <p class="text-white"><%= time_ago_in_words(@profile.last_scanned_at) %> atrás</p>
-              </div>
+          <div class="flex items-center gap-3 text-gray-400 <%= 'hidden' unless @profile.last_scanned_at.present? %>" data-profile-last-scanned-container>
+            <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p class="text-xs text-gray-500">Último scan</p>
+              <p class="text-white" data-profile-last-scanned><%= @profile.last_scanned_at.present? ? "#{time_ago_in_words(@profile.last_scanned_at)} atrás" : "" %></p>
             </div>
-          <% end %>
+          </div>
 
           <div class="flex items-center gap-3 text-gray-400">
             <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -164,13 +251,11 @@
           </div>
         </div>
 
-        <% if @profile.last_error.present? %>
-          <div class="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-            <p class="text-sm text-red-400">
-              <span class="font-semibold">Erro:</span> <%= @profile.last_error %>
-            </p>
-          </div>
-        <% end %>
+        <div class="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg <%= 'hidden' unless @profile.last_error.present? %>" data-profile-error-container>
+          <p class="text-sm text-red-400">
+            <span class="font-semibold">Erro:</span> <span data-profile-error><%= @profile.last_error %></span>
+          </p>
+        </div>
       </div>
 
       <!-- Action Buttons -->

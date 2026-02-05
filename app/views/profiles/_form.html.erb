@@ -1,6 +1,5 @@
 <!-- app/views/profiles/_form.html.erb (versão atualizada) -->
 <%= form_with model: profile,
-              data: { controller: "form-validation" },
               class: "p-8" do |f| %>
 
   <!-- Error Summary -->
@@ -66,11 +65,7 @@
     <!-- Input Field -->
     <%= f.text_field :github_username,
         placeholder: "username",
-        class: "w-full bg-slate-900/50 border pl-44 pr-4 py-3.5 rounded-xl text-white placeholder-gray-500 transition-all focus:outline-none focus:ring-2 #{profile.errors[:github_username].any? ? 'border-red-500 focus:ring-red-500/50 focus:border-red-500' : 'border-slate-600 focus:ring-indigo-500/50 focus:border-indigo-500'}",
-        data: {
-          action: "blur->form-validation#validateGithubUsername input->form-validation#validateGithubUsername",
-          form_validation_target: "githubInput"
-        } %>
+        class: "w-full bg-slate-900/50 border pl-44 pr-4 py-3.5 rounded-xl text-white placeholder-gray-500 transition-all focus:outline-none focus:ring-2 #{profile.errors[:github_username].any? ? 'border-red-500 focus:ring-red-500/50 focus:border-red-500' : 'border-slate-600 focus:ring-indigo-500/50 focus:border-indigo-500'}" %>
   </div>
 
   <% if profile.errors[:github_username].any? %>
@@ -81,11 +76,11 @@
       <%= profile.errors[:github_username].first %>
     </p>
   <% else %>
-    <p class="mt-2 text-sm flex items-center gap-1" data-form-validation-target="hint">
+    <p class="mt-2 text-sm flex items-center gap-1">
       <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <span data-form-validation-target="hintText" class="text-gray-500">Digite apenas o username (ex: torvalds)</span>
+      <span class="text-gray-500">Digite apenas o username (ex: torvalds)</span>
     </p>
   <% end %>
   
