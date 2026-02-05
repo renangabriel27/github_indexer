@@ -103,12 +103,19 @@
         </div>
 
         <!-- Contributions -->
-        <div class="bg-slate-900/50 rounded-xl p-6 text-center hover:bg-slate-900 transition-colors">
+        <div class="bg-slate-900/50 rounded-xl p-6 text-center hover:bg-slate-900 transition-colors relative group">
           <svg class="w-8 h-8 text-green-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
           <p class="text-3xl font-bold text-white mb-1"><%= number_with_delimiter(@profile.contributions_last_year) %></p>
           <p class="text-sm text-gray-400">Contribuições</p>
+          <!-- Tooltip -->
+          <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+            Contribuições do último ano
+            <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+              <div class="border-4 border-transparent border-t-gray-900"></div>
+            </div>
+          </div>
         </div>
       </div>
 

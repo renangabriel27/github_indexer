@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :profile do
     name { Faker::Name.name }
-    github_username { Faker::Internet.username(specifier: 4..15) }
+    github_username { Faker::Internet.username(specifier: 4..15).gsub(/[^a-zA-Z0-9-]/, '').gsub(/^-|-$/, '') }
     short_github_url { "https://githu.short.gy/#{SecureRandom.alphanumeric(6)}" }
     followers { Faker::Number.between(from: 0, to: 50_000) }
     following { Faker::Number.between(from: 0, to: 1_000) }
@@ -9,7 +9,7 @@ FactoryBot.define do
     contributions_last_year { Faker::Number.between(from: 0, to: 2_000) }
     avatar_url { Faker::Avatar.image(slug: github_username, size: "200x200") }
     location { Faker::Address.city }
-    organizations { Faker::Company.name }
+    organizations { [Faker::Company.name] }
     scraping_status { "completed" }
     last_error { nil }
     last_scanned_at { Time.current }

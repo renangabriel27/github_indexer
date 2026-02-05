@@ -11,6 +11,7 @@ require 'support/shoulda'
 require 'support/capybara'
 require 'support/database_cleaner'
 require 'support/simplecov'
+require 'support/webmock'
 
 begin
   ActiveRecord::Migration.maintain_test_schema!

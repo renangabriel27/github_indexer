@@ -22,15 +22,19 @@ gem "redis"
 gem "httparty"
 gem "blueprinter"
 gem "pagy"
+gem "rswag-api"
+gem "rswag-ui"
 
 # Utilities
 gem "dry-monads"
+gem "ostruct"
 
 # Rate limiting
 gem "rack-attack"
 
 group :development, :test do
   gem "rspec-rails"
+  gem "rswag-specs"
   gem "factory_bot_rails"
   gem "faker"
   gem "byebug"
