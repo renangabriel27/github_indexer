@@ -8,7 +8,6 @@ gem "puma", ">= 5.0"
 gem "propshaft"
 
 # Frontend
-gem "tailwindcss-rails"
 gem "view_component"
 
 # Scraping

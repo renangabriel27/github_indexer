@@ -1,28 +1,199 @@
-<div class="max-w-4xl mx-auto">
-  <div class="card">
-    <%= image_tag @profile.avatar_url, class: "w-24 h-24 rounded-full" if @profile.avatar_url %>
-    <h1 class="text-3xl font-bold mt-4"><%= @profile.name %></h1>
-    <p class="text-gray-600"><%= @profile.github_username %></p>
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 py-12">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
-    <div class="grid grid-cols-3 gap-4 mt-6">
-      <div class="text-center">
-        <p class="text-2xl font-bold"><%= @profile.followers %></p>
-        <p class="text-gray-600">Followers</p>
-      </div>
-      <div class="text-center">
-        <p class="text-2xl font-bold"><%= @profile.following %></p>
-        <p class="text-gray-600">Following</p>
-      </div>
-      <div class="text-center">
-        <p class="text-2xl font-bold"><%= @profile.stars %></p>
-        <p class="text-gray-600">Stars</p>
-      </div>
+    <div class="mb-6">
+      <%= link_to profiles_path, class: "inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors" do %>
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Voltar para perfis
+      <% end %>
     </div>
 
-    <div class="mt-6 flex gap-3">
-      <%= button_to "Re-escanear", rescan_profile_path(@profile), class: "btn-primary" %>
-      <%= link_to "Editar", edit_profile_path(@profile), class: "btn-secondary" %>
-      <%= button_to "Remover", @profile, method: :delete, data: { confirm: "Confirma?" }, class: "btn-danger" %>
+    <div class="bg-slate-800 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden">
+      <!-- Header with Avatar and Basic Info -->
+      <div class="relative bg-gradient-to-r from-indigo-900/50 to-purple-900/50 px-8 py-12 sm:px-12">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+
+          <!-- Avatar -->
+          <div class="relative group">
+            <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full blur opacity-50 group-hover:opacity-75 transition"></div>
+            <%= image_tag @profile.avatar_url,
+                class: "relative w-32 h-32 rounded-full ring-4 ring-slate-700",
+                alt: @profile.name if @profile.avatar_url %>
+          </div>
+
+          <!-- Name and Username -->
+          <div class="flex-1 text-center sm:text-left">
+            <h1 class="text-4xl sm:text-5xl font-bold text-white mb-2">
+              <%= @profile.name %>
+            </h1>
+
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 mb-4">
+              <a href="<%= @profile.short_github_url %>" target="_blank" rel="noopener noreferrer" 
+                 class="inline-flex items-center gap-2 text-lg text-indigo-400 hover:text-indigo-300 transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+                </svg>
+                @<%= @profile.github_username %>
+              </a>
+
+              <% if @profile.location.present? %>
+                <span class="inline-flex items-center gap-1.5 text-gray-400">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <%= @profile.location %>
+                </span>
+              <% end %>
+            </div>
+
+            <!-- Status Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
+                        <%= @profile.scraping_status == 'completed' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                            @profile.scraping_status == 'pending' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
+                            @profile.scraping_status == 'processing' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                            'bg-red-500/20 text-red-400 border border-red-500/30' %>">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full
+                             <%= @profile.scraping_status == 'completed' ? 'bg-green-400' :
+                                 @profile.scraping_status == 'pending' ? 'bg-yellow-400' :
+                                 @profile.scraping_status == 'processing' ? 'bg-blue-400' :
+                                 'bg-red-400' %> opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2
+                             <%= @profile.scraping_status == 'completed' ? 'bg-green-500' :
+                                 @profile.scraping_status == 'pending' ? 'bg-yellow-500' :
+                                 @profile.scraping_status == 'processing' ? 'bg-blue-500' :
+                                 'bg-red-500' %>"></span>
+              </span>
+              <%= @profile.scraping_status.capitalize %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-8 border-b border-slate-700">
+        <!-- Followers -->
+        <div class="bg-slate-900/50 rounded-xl p-6 text-center hover:bg-slate-900 transition-colors">
+          <svg class="w-8 h-8 text-indigo-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <p class="text-3xl font-bold text-white mb-1"><%= number_with_delimiter(@profile.followers) %></p>
+          <p class="text-sm text-gray-400">Followers</p>
+        </div>
+
+        <!-- Following -->
+        <div class="bg-slate-900/50 rounded-xl p-6 text-center hover:bg-slate-900 transition-colors">
+          <svg class="w-8 h-8 text-purple-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <p class="text-3xl font-bold text-white mb-1"><%= number_with_delimiter(@profile.following) %></p>
+          <p class="text-sm text-gray-400">Following</p>
+        </div>
+
+        <!-- Stars -->
+        <div class="bg-slate-900/50 rounded-xl p-6 text-center hover:bg-slate-900 transition-colors">
+          <svg class="w-8 h-8 text-yellow-400 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          <p class="text-3xl font-bold text-white mb-1"><%= number_with_delimiter(@profile.stars) %></p>
+          <p class="text-sm text-gray-400">Stars</p>
+        </div>
+
+        <!-- Contributions -->
+        <div class="bg-slate-900/50 rounded-xl p-6 text-center hover:bg-slate-900 transition-colors">
+          <svg class="w-8 h-8 text-green-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <p class="text-3xl font-bold text-white mb-1"><%= number_with_delimiter(@profile.contributions_last_year) %></p>
+          <p class="text-sm text-gray-400">Contributions</p>
+        </div>
+      </div>
+
+      <!-- Organizations (if any) -->
+      <% if @profile.organizations.present? && @profile.organizations.any? %>
+        <div class="p-8 border-b border-slate-700">
+          <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            Organizações
+          </h2>
+          <div class="flex flex-wrap gap-3">
+            <% @profile.organizations.each do |org| %>
+              <span class="inline-flex items-center gap-2 px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-gray-300 hover:bg-slate-900 hover:border-indigo-500/50 transition-all">
+                <%= org %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Additional Info -->
+      <div class="p-8 bg-slate-900/30">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <% if @profile.last_scanned_at.present? %>
+            <div class="flex items-center gap-3 text-gray-400">
+              <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p class="text-xs text-gray-500">Último scan</p>
+                <p class="text-white"><%= time_ago_in_words(@profile.last_scanned_at) %> atrás</p>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="flex items-center gap-3 text-gray-400">
+            <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <div>
+              <p class="text-xs text-gray-500">Adicionado em</p>
+              <p class="text-white"><%= l(@profile.created_at, format: :short) %></p>
+            </div>
+          </div>
+        </div>
+
+        <% if @profile.last_error.present? %>
+          <div class="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+            <p class="text-sm text-red-400">
+              <span class="font-semibold">Erro:</span> <%= @profile.last_error %>
+            </p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="p-8 bg-slate-900/50 flex flex-wrap gap-3">
+        <%= button_to rescan_profile_path(@profile),
+            class: "inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white font-semibold hover:shadow-lg hover:shadow-indigo-500/50 transition-all duration-200 hover:scale-105" do %>
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Re-escanear Perfil
+        <% end %>
+
+        <%= link_to edit_profile_path(@profile),
+            class: "inline-flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium transition-all duration-200" do %>
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Editar
+        <% end %>
+
+        <%= button_to @profile,
+            method: :delete,
+            data: { turbo_confirm: "Tem certeza que deseja remover este perfil?" },
+            class: "inline-flex items-center gap-2 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl text-red-400 font-medium transition-all duration-200" do %>
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Remover
+        <% end %>
+      </div>
     </div>
   </div>
 </div>

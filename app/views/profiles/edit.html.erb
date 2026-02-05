@@ -1,4 +1,103 @@
-<div class="max-w-2xl mx-auto">
-  <h1 class="text-3xl font-bold mb-8">Editar Perfil</h1>
-  <%= render 'form', profile: @profile %>
+<!-- app/views/profiles/edit.html.erb -->
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 py-12">
+  <div class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
+
+    <!-- Back Button -->
+    <div class="mb-6">
+      <%= link_to @profile, class: "inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors" do %>
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Voltar para o perfil
+      <% end %>
+    </div>
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="relative inline-block mb-4">
+        <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full blur opacity-50"></div>
+        <%= image_tag @profile.avatar_url,
+            class: "relative w-20 h-20 rounded-full ring-4 ring-slate-700",
+            alt: @profile.name if @profile.avatar_url %>
+      </div>
+
+      <h1 class="text-4xl font-bold text-white mb-2">Editar Perfil</h1>
+      <p class="text-gray-400">
+        Atualize as informações de
+        <span class="text-indigo-400 font-semibold">@<%= @profile.github_username %></span>
+      </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+      <%= render 'form', profile: @profile %>
+    </div>
+
+    <!-- Additional Info -->
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Last Scan Info -->
+      <div class="p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl">
+        <div class="flex items-center gap-3">
+          <div class="flex-shrink-0">
+            <svg class="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs text-gray-500">Último scan</p>
+            <p class="text-sm text-gray-300 truncate">
+              <% if @profile.last_scanned_at.present? %>
+                <%= time_ago_in_words(@profile.last_scanned_at) %> atrás
+              <% else %>
+                Nunca escaneado
+              <% end %>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Created At Info -->
+      <div class="p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl">
+        <div class="flex items-center gap-3">
+          <div class="flex-shrink-0">
+            <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs text-gray-500">Adicionado em</p>
+            <p class="text-sm text-gray-300 truncate">
+              <%= l(@profile.created_at, format: :short) %>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="mt-8 p-6 bg-red-500/5 border border-red-500/20 rounded-xl">
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0">
+          <svg class="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold text-red-400 mb-2">Zona de Perigo</h3>
+          <p class="text-sm text-gray-400 mb-4">
+            Remover este perfil irá deletar permanentemente todos os dados associados. Esta ação não pode ser desfeita.
+          </p>
+          <%= button_to @profile,
+              method: :delete,
+              data: { turbo_confirm: "Tem certeza que deseja remover o perfil de @#{@profile.github_username}? Esta ação não pode ser desfeita." },
+              class: "inline-flex items-center gap-2 px-5 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 rounded-lg text-red-400 font-medium transition-all duration-200" do %>
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Remover Perfil
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

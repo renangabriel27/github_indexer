@@ -1,25 +1,42 @@
-<div class="card group hover:shadow-lg transition-shadow">
-  <div class="flex items-start gap-4">
-    <%= image_tag @profile.avatar_url || "https://via.placeholder.com/64",
-        class: "w-16 h-16 rounded-full ring-2 ring-gray-100" %>
+<!-- app/components/profile_card_component.html.erb -->
+<div class="group bg-slate-800 border border-slate-700 rounded-2xl p-6 hover:bg-slate-750 hover:border-slate-600 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1">
+  <%= link_to profile_path(@profile), class: "block" do %>
+    <div class="flex items-center gap-4 mb-4">
+      <%= image_tag @profile.avatar_url || "https://github.com/identicons/#{@profile.github_username}.png", 
+          class: "h-16 w-16 rounded-full ring-2 ring-slate-600 group-hover:ring-indigo-500 transition-all",
+          alt: @profile.name || @profile.github_username %>
 
-    <div class="flex-1 min-w-0">
-      <h3 class="font-bold text-lg truncate"><%= @profile.name %></h3>
-      <p class="text-gray-600 text-sm"><%= @profile.github_username %></p>
-
-      <div class="flex gap-4 mt-2 text-sm text-gray-600">
-        <span><%= @profile.followers %> followers</span>
-        <span><%= @profile.stars %> stars</span>
+      <div class="flex-1 min-w-0">
+        <h3 class="text-lg font-bold text-white truncate group-hover:text-indigo-400 transition-colors">
+          <%= @profile.name || @profile.github_username %>
+        </h3>
+        <p class="text-sm text-gray-400 truncate">
+          @<%= @profile.github_username %>
+        </p>
       </div>
     </div>
 
-    <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-      <%= link_to profile_path(@profile), class: "btn-icon btn-secondary" do %>
-        👁️
-      <% end %>
-      <%= link_to edit_profile_path(@profile), class: "btn-icon btn-secondary" do %>
-        ✏️
-      <% end %>
+    <div class="flex items-center gap-4 text-sm">
+      <div class="flex items-center gap-1.5 text-gray-400">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        <span><%= @profile.followers || 0 %> followers</span>
+      </div>
+
+      <div class="flex items-center gap-1.5 text-gray-400">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+        <span><%= @profile.stars || 0 %> stars</span>
+      </div>
     </div>
-  </div>
+
+    <!-- Footer with date -->
+    <div class="mt-4 pt-4 border-t border-slate-700">
+      <p class="text-xs text-gray-500">
+        Adicionado em <%= l(@profile.created_at, format: :short) %>
+      </p>
+    </div>
+  <% end %>
 </div>

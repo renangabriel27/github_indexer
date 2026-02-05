@@ -4,11 +4,11 @@
     <title>GitHub Indexer</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= render 'layouts/tailwind' %>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-gray-50">
-    <main class="container mx-auto px-4 py-8">
+  <body>
+    <main>
       <%= yield %>
     </main>
   </body>
