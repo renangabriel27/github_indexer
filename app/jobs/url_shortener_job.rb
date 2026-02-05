@@ -8,7 +8,7 @@ class UrlShortenerJob < ApplicationJob
 
     Rails.logger.info "=== UrlShortenerJob iniciado para profile_id: #{profile_id} ==="
 
-    github_url = "https://www.github.com.br#{profile.github_username}"
+    github_url = "https://www.github.com.br/#{profile.github_username}"
     service = ShortioUrlShortenerService.new(github_url)
     short_github_url = service.call[:short_url]
 

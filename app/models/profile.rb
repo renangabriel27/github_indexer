@@ -14,6 +14,7 @@ class Profile < ApplicationRecord
   }, if: -> { github_username.present? }
 
   validate :validate_github_username_format, if: -> { github_username.present? }
+  validate :not_organization, if: :github_username_changed?
 
   before_validation :normalize_github_username
   before_save :reset_scraping_data, if: :github_username_changed?
@@ -38,6 +39,22 @@ class Profile < ApplicationRecord
   end
 
   private
+
+  def not_organization
+    return unless github_username.present?
+
+    uri = URI("https://api.github.com/users/#{github_username}")
+    response = Net::HTTP.get_response(uri)
+
+    if response.is_a?(Net::HTTPSuccess)
+      data = JSON.parse(response.body)
+      if data['type'] == 'Organization'
+        errors.add(:github_username, 'não pode ser uma organização')
+      end
+    end
+  rescue StandardError => e
+    Rails.logger.error("Erro validando GitHub: #{e.message}")
+  end
 
   def normalize_github_username
     return unless github_username.present?
