@@ -70,6 +70,18 @@ pt-BR:
         other: não possui o tamanho esperado (%{count} caracteres)
       record_invalid: "Registro inválido"
       invalid_payment_method: "não é válido"
+    not_found:
+      title: "Página não encontrada"
+      message: "A página que você está procurando não existe ou foi movida. Verifique o endereço e tente novamente."
+      back_to_home: "Voltar para home"
+    unprocessable_entity:
+      title: "Requisição não processada"
+      message: "A alteração que você tentou fazer foi rejeitada. Talvez você tenha tentado modificar algo sem permissão ou os dados enviados estão inválidos."
+      back_to_home: "Voltar para home"
+    internal_server_error:
+      title: "Erro interno do servidor"
+      message: "Algo deu errado no servidor. Nossa equipe foi notificada e está trabalhando para resolver o problema. Tente novamente em alguns instantes."
+      back_to_home: "Voltar para home"
   helpers:
     submit:
       create: "Criar %{model}"
