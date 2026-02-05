@@ -1,4 +1,6 @@
 class Profile < ApplicationRecord
+  include Searchable
+
   validates :name, presence: true
   validates :github_username, presence: true
   validates :github_username, uniqueness: { case_sensitive: false }
@@ -27,11 +29,6 @@ class Profile < ApplicationRecord
     processing: "processing",
     completed: "completed",
     failed: "failed"
-  }
-
-  scope :search, ->(q) {
-    return all if q.blank?
-    where("name ILIKE :q OR github_username ILIKE :q OR location ILIKE :q", q: "%#{q}%")
   }
 
   def can_rescan?
