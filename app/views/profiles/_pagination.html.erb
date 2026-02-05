@@ -4,9 +4,8 @@
     <% if pagy.pages > 1 %>
       <div class="flex items-center justify-center gap-6">
         <!-- Previous Button -->
-        <% prev_page = pagy.page > 1 ? pagy.page - 1 : nil %>
-        <% if prev_page %>
-          <%= link_to profiles_path(request.query_parameters.merge(page: prev_page)), 
+        <% if pagy_prev_page(pagy) %>
+          <%= link_to profiles_path(request.query_parameters.merge(page: pagy_prev_page(pagy))),
               class: "group relative inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20 mr-2",
               data: { turbo_frame: "profiles" } do %>
             <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -25,57 +24,24 @@
 
         <!-- Page Numbers -->
         <div class="flex items-center gap-4 mx-2">
-          <% 
-            # Gerar série de páginas manualmente
-            current_page = pagy.page
-            total_pages = pagy.pages
-            series = []
-            
-            if total_pages <= 7
-              # Mostrar todas as páginas se houver 7 ou menos
-              (1..total_pages).each { |p| series << p }
-            else
-              # Lógica para muitas páginas
-              if current_page <= 3
-                # Perto do início
-                (1..4).each { |p| series << p }
-                series << "..."
-                series << total_pages
-              elsif current_page >= total_pages - 2
-                # Perto do fim
-                series << 1
-                series << "..."
-                ((total_pages - 3)..total_pages).each { |p| series << p }
-              else
-                # No meio
-                series << 1
-                series << "..."
-                ((current_page - 1)..(current_page + 1)).each { |p| series << p }
-                series << "..."
-                series << total_pages
-              end
-            end
-            
-            series.each do |item|
-              if item == "..."
-          %>
-            <span class="px-3 py-2.5 text-gray-500 text-sm">…</span>
-          <%    elsif item == current_page %>
-            <span class="relative px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white font-semibold text-sm shadow-lg shadow-indigo-500/50">
-              <%= item %>
-            </span>
-          <%    else %>
-            <%= link_to item, profiles_path(request.query_parameters.merge(page: item)), 
-                class: "px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium text-sm transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20",
-                data: { turbo_frame: "profiles" } %>
-          <%    end %>
+          <% pagy_series(pagy).each do |item| %>
+            <% if item == "..." %>
+              <span class="px-3 py-2.5 text-gray-500 text-sm">…</span>
+            <% elsif item == pagy.page %>
+              <span class="relative px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white font-semibold text-sm shadow-lg shadow-indigo-500/50">
+                <%= item %>
+              </span>
+            <% else %>
+              <%= link_to item, profiles_path(request.query_parameters.merge(page: item)),
+                  class: "px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium text-sm transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20",
+                  data: { turbo_frame: "profiles" } %>
+            <% end %>
           <% end %>
         </div>
 
         <!-- Next Button -->
-        <% next_page = pagy.page < pagy.pages ? pagy.page + 1 : nil %>
-        <% if next_page %>
-          <%= link_to profiles_path(request.query_parameters.merge(page: next_page)), 
+        <% if pagy_next_page(pagy) %>
+          <%= link_to profiles_path(request.query_parameters.merge(page: pagy_next_page(pagy))),
               class: "group relative inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20 ml-2",
               data: { turbo_frame: "profiles" } do %>
             <span>Próxima</span>

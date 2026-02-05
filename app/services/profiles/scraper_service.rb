@@ -80,7 +80,7 @@ module Profiles
 
     def extract_name(doc)
       name = doc.at_css('[itemprop="name"]')&.text&.strip
-      name || doc.at_css('.p-name')&.text&.strip
+      name || doc.at_css(".p-name")&.text&.strip
     end
 
     def extract_username(doc)
@@ -130,7 +130,7 @@ module Profiles
       avatar ||= doc.at_css('meta[property="og:image"]')&.[]("content")
 
       avatar = normalize_url(avatar)
-      avatar&.gsub(/s=64&/, '')
+      avatar&.gsub(/s=64&/, "")
     end
 
     def extract_location(doc)

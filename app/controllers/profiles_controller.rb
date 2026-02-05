@@ -6,7 +6,7 @@ class ProfilesController < ApplicationController
     search_query = params[:q]
     profiles = profiles.search(search_query) if search_query.present?
     profiles = profiles.order(created_at: :desc)
-    
+
     @pagy, @profiles = pagy(:offset, profiles, offset: calculate_offset, limit: per_page)
   end
 

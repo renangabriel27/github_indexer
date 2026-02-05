@@ -48,8 +48,8 @@ class Profile < ApplicationRecord
 
     if response.is_a?(Net::HTTPSuccess)
       data = JSON.parse(response.body)
-      if data['type'] == 'Organization'
-        errors.add(:github_username, 'não pode ser uma organização')
+      if data["type"] == "Organization"
+        errors.add(:github_username, "não pode ser uma organização")
       end
     end
   rescue StandardError => e
@@ -64,11 +64,11 @@ class Profile < ApplicationRecord
   def validate_github_username_format
     return unless github_username.present?
 
-    if github_username.start_with?('-') || github_username.end_with?('-')
+    if github_username.start_with?("-") || github_username.end_with?("-")
       errors.add(:github_username, "não pode começar ou terminar com hífen")
     end
 
-    if github_username.include?('--')
+    if github_username.include?("--")
       errors.add(:github_username, "não pode conter hífens consecutivos")
     end
   end
@@ -95,7 +95,7 @@ class Profile < ApplicationRecord
   end
 
   def reset_scraping_data
-    self.scraping_status = 'pending'
+    self.scraping_status = "pending"
     self.last_scanned_at = nil
     self.last_error = nil
   end
