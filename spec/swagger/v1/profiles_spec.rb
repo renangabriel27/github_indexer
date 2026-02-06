@@ -81,9 +81,11 @@ RSpec.describe 'Profiles API', type: :request do
       response '200', 'Busca de perfis' do
         schema '$ref' => '#/components/schemas/ProfilesResponse'
 
+        before { Profile.destroy_all }
+
         let(:search) { 'Test' }
         let!(:profile1) { create(:profile, name: 'Test User') }
-        let!(:profile2) { create(:profile, name: 'Another User') }
+        let!(:profile2) { create(:profile, name: 'Another User', github_username: 'anotheruser') }
 
         run_test! do |response|
           data = JSON.parse(response.body)
