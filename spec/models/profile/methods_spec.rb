@@ -59,4 +59,3 @@ RSpec.describe Profile, type: :model do
     end
   end
 end
-

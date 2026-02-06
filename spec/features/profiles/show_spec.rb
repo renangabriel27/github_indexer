@@ -13,7 +13,7 @@ RSpec.describe 'Profiles Show', type: :feature do
            stars: 200,
            contributions_last_year: 150,
            location: 'San Francisco',
-           organizations: ['Org1', 'Org2'],
+           organizations: [ 'Org1', 'Org2' ],
            avatar_url: 'https://example.com/avatar.jpg',
            scraping_status: 'completed',
            last_scanned_at: 1.hour.ago)

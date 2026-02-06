@@ -125,4 +125,3 @@ RSpec.describe 'GET /api/v1/profiles', type: :request do
     end
   end
 end
-

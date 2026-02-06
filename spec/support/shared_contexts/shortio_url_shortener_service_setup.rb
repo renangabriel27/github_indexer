@@ -11,4 +11,3 @@ RSpec.shared_context 'ShortioUrlShortenerService setup' do
     allow(ENV).to receive(:fetch).with('SHORTIO_DOMAIN', 'go.short.io').and_return(domain)
   end
 end
-

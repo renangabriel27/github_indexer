@@ -39,4 +39,3 @@ module Searchable
     end
   end
 end
-

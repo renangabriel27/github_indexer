@@ -10,7 +10,7 @@ RSpec.describe 'GET /api/v1/profiles/:id', type: :request do
              github_username: 'testuser',
              followers: 100,
              location: 'San Francisco',
-             organizations: ['Org1', 'Org2'])
+             organizations: [ 'Org1', 'Org2' ])
     end
 
     it 'returns profile with correct data and structure' do
@@ -62,4 +62,3 @@ RSpec.describe 'GET /api/v1/profiles/:id', type: :request do
     end
   end
 end
-

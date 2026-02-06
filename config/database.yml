@@ -16,7 +16,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: github_indexer_test
+  url: <%= ENV['DATABASE_URL'] %>
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   min_messages: WARNING
 

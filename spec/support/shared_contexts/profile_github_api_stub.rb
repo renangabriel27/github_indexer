@@ -20,4 +20,3 @@ RSpec.shared_context 'Profile GitHub API stubs' do
       )
   end
 end
-

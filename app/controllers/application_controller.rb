@@ -9,10 +9,10 @@ class ApplicationController < ActionController::Base
   private
 
   def render_not_found
-    render 'errors/not_found', status: :not_found, layout: 'application'
+    render "errors/not_found", status: :not_found, layout: "application"
   end
 
   def render_unprocessable_entity
-    render 'errors/unprocessable_entity', status: :unprocessable_entity, layout: 'application'
+    render "errors/unprocessable_entity", status: :unprocessable_entity, layout: "application"
   end
 end

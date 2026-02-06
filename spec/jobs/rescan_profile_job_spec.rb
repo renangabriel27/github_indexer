@@ -67,4 +67,3 @@ RSpec.describe RescanProfileJob, type: :job do
     end
   end
 end
-

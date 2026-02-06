@@ -9,7 +9,7 @@ FactoryBot.define do
     contributions_last_year { Faker::Number.between(from: 0, to: 2_000) }
     avatar_url { Faker::Avatar.image(slug: github_username, size: "200x200") }
     location { Faker::Address.city }
-    organizations { [Faker::Company.name] }
+    organizations { [ Faker::Company.name ] }
     scraping_status { "completed" }
     last_error { nil }
     last_scanned_at { Time.current }

@@ -53,4 +53,3 @@ RSpec.describe UrlShortenerJob, type: :job do
     end
   end
 end
-

@@ -20,7 +20,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do |example|
-    unless example.metadata[:type].in?([:feature, :system])
+    unless example.metadata[:type].in?([ :feature, :system ])
       DatabaseCleaner.strategy = :transaction
     end
   end

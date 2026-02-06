@@ -32,4 +32,3 @@ RSpec.describe GithubScraperJob, type: :job do
     end
   end
 end
-

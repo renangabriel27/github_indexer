@@ -68,12 +68,25 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    # services:
-    #  redis:
-    #    image: valkey/valkey:8
-    #    ports:
-    #      - 6379:6379
-    #    options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_indexer_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/github_indexer_test
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -88,16 +101,16 @@ jobs:
         with:
           chrome-version: stable
 
-      - name: Prepare database (create/migrate)
-        env:
-          RAILS_ENV: test
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h postgres -p 5432; do
+            sleep 1
+          done
+
+      - name: Prepare database
         run: |
           bundle exec rails db:create
-          bundle exec rails db:migrate
+          bundle exec rails db:schema:load
 
       - name: Run Rspec tests
-        env:
-          RAILS_ENV: test
-          # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-          # REDIS_URL: redis://localhost:6379/0
         run: bundle exec rspec

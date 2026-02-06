@@ -21,7 +21,7 @@ RSpec.describe Profile, type: :model do
       end
 
       it 'accepts valid usernames' do
-        valid_usernames = ['user123', 'user-name', 'User123', 'a', 'a-b-c']
+        valid_usernames = [ 'user123', 'user-name', 'User123', 'a', 'a-b-c' ]
         valid_usernames.each do |username|
           stub_github_api(username.downcase)
           profile = build(:profile, github_username: username)
@@ -30,7 +30,7 @@ RSpec.describe Profile, type: :model do
       end
 
       it 'rejects invalid format' do
-        invalid_usernames = ['user_name', 'user.name', 'user@name', 'user name']
+        invalid_usernames = [ 'user_name', 'user.name', 'user@name', 'user name' ]
         invalid_usernames.each do |username|
           profile = build(:profile, github_username: username)
           expect(profile).not_to be_valid
@@ -80,4 +80,3 @@ RSpec.describe Profile, type: :model do
     end
   end
 end
-
