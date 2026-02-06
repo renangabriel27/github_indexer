@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe 'API Rate Limiting', type: :request do
+  include_context 'Profile GitHub API stubs'
+
   before do
     Rack::Attack.cache.store.clear
   end
