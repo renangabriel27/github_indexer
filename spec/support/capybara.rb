@@ -13,10 +13,17 @@ Capybara.register_driver :headless_chrome do |app|
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
 end
 
+# Configure default driver to headless for all tests
+Capybara.default_driver = :headless_chrome
 Capybara.javascript_driver = :headless_chrome
 
 RSpec.configure do |config|
-  config.before(:each, type: :system) do
-    driven_by :headless_chrome
+  # Configure both :system and :feature tests to use headless
+  config.before(:each, type: :system) do |example|
+    Capybara.current_driver = :headless_chrome
+  end
+
+  config.before(:each, type: :feature) do |example|
+    Capybara.current_driver = :headless_chrome
   end
 end
