@@ -40,6 +40,7 @@ group :development, :test do
   gem "faker"
   gem "byebug"
   gem "rubocop-rails-omakase", require: false
+  gem "brakeman", require: false
   gem "dotenv-rails"
 end
 
