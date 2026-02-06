@@ -9,7 +9,7 @@ RSpec.describe RescanProfileJob, type: :job do
     context 'when profile can be rescanned' do
       let(:profile) { create(:profile, last_scanned_at: 10.minutes.ago, scraping_status: :completed) }
 
-      it 'updates scraping_status to processing and calls ScraperService' do
+      it 'updates scraping_status and processes the profile' do
         initial_status = profile.scraping_status
         described_class.new.perform(profile.id)
 
@@ -33,18 +33,12 @@ RSpec.describe RescanProfileJob, type: :job do
         described_class.new.perform(profile.id)
         expect(profile.reload.scraping_status).to eq(initial_status)
       end
-
-      it 'does not call ScraperService' do
-        initial_status = profile.scraping_status
-        described_class.new.perform(profile.id)
-        expect(profile.reload.scraping_status).to eq(initial_status)
-      end
     end
 
     context 'when profile has never been scanned' do
       let(:profile) { create(:profile, last_scanned_at: nil, scraping_status: :pending) }
 
-      it 'updates scraping_status to processing and calls ScraperService' do
+      it 'processes the profile' do
         initial_status = profile.scraping_status
         described_class.new.perform(profile.id)
 
@@ -53,12 +47,10 @@ RSpec.describe RescanProfileJob, type: :job do
       end
     end
 
-    context 'when profile does not exist' do
-      it 'raises ActiveRecord::RecordNotFound' do
-        expect do
-          described_class.new.perform(999_999)
-        end.to raise_error(ActiveRecord::RecordNotFound)
-      end
+    it 'raises ActiveRecord::RecordNotFound when profile does not exist' do
+      expect do
+        described_class.new.perform(999_999)
+      end.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 end

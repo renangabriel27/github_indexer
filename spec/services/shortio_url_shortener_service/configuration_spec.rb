@@ -2,11 +2,11 @@
 
 require 'rails_helper'
 
-RSpec.describe ShortioUrlShortenerService, 'initialization' do
+RSpec.describe ShortioUrlShortenerService, 'configuration' do
   let(:long_url) { 'https://github.com/testuser' }
   let(:api_key) { 'test_api_key_123' }
 
-  describe '#initialize' do
+  describe 'initialization' do
     context 'when SHORTIO_DOMAIN is provided' do
       let(:custom_domain) { 'custom.short.io' }
 
@@ -74,4 +74,3 @@ RSpec.describe ShortioUrlShortenerService, 'initialization' do
     end
   end
 end
-

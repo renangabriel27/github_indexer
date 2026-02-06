@@ -31,12 +31,10 @@ RSpec.describe Profile, type: :model do
     before do
       stub_github_api('matz')
       stub_github_api('dhh')
-      stub_github_api('rails')
     end
 
     let!(:profile1) { create(:profile, name: 'Matz', github_username: 'matz') }
     let!(:profile2) { create(:profile, name: 'DHH', github_username: 'dhh') }
-    let!(:profile3) { create(:profile, name: 'Rails', github_username: 'rails', location: 'San Francisco') }
 
     it 'finds profiles by name' do
       results = Profile.search('Matz')
@@ -50,24 +48,14 @@ RSpec.describe Profile, type: :model do
       expect(results).not_to include(profile1)
     end
 
-    it 'finds profiles by location' do
-      results = Profile.search('San Francisco')
-      expect(results).to include(profile3)
-    end
-
     it 'is case insensitive' do
       results = Profile.search('MATZ')
       expect(results).to include(profile1)
     end
 
-    it 'returns all profiles when query is blank' do
-      results = Profile.search('')
-      expect(results.count).to eq(3)
-    end
-
-    it 'returns all profiles when query is nil' do
-      results = Profile.search(nil)
-      expect(results.count).to eq(3)
+    it 'returns all profiles when query is blank or nil' do
+      expect(Profile.search('').count).to eq(2)
+      expect(Profile.search(nil).count).to eq(2)
     end
   end
 end

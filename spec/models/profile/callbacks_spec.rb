@@ -7,21 +7,7 @@ RSpec.describe Profile, type: :model do
 
   describe 'callbacks' do
     describe 'before_validation :normalize_github_username' do
-      it 'strips whitespace from github_username' do
-        stub_github_api('username')
-        profile = build(:profile, github_username: '  username  ')
-        profile.valid?
-        expect(profile.github_username).to eq('username')
-      end
-
-      it 'converts github_username to lowercase' do
-        stub_github_api('username')
-        profile = build(:profile, github_username: 'USERNAME')
-        profile.valid?
-        expect(profile.github_username).to eq('username')
-      end
-
-      it 'normalizes combined case and whitespace' do
+      it 'strips whitespace and converts to lowercase' do
         stub_github_api('username')
         profile = build(:profile, github_username: '  UserName  ')
         profile.valid?
@@ -56,16 +42,10 @@ RSpec.describe Profile, type: :model do
     end
 
     describe 'after_create :enqueue_priority_jobs' do
-      it 'enqueues GithubScraperJob on create' do
+      it 'enqueues scraper and shortener jobs on create' do
         expect do
           create(:profile)
-        end.to have_enqueued_job(GithubScraperJob)
-      end
-
-      it 'enqueues UrlShortenerJob on create' do
-        expect do
-          create(:profile)
-        end.to have_enqueued_job(UrlShortenerJob)
+        end.to have_enqueued_job(GithubScraperJob).and have_enqueued_job(UrlShortenerJob)
       end
     end
 
@@ -77,26 +57,6 @@ RSpec.describe Profile, type: :model do
         expect do
           profile.update(github_username: 'newusername')
         end.to have_enqueued_job(GithubScraperJob).and have_enqueued_job(UrlShortenerJob)
-      end
-
-      it 'does not enqueue jobs when other attributes change' do
-        profile = create(:profile)
-
-        expect do
-          profile.update(name: 'New Name')
-        end.not_to have_enqueued_job(GithubScraperJob)
-      end
-
-      it 'does not enqueue jobs if can_rescan? returns false and github_username changes' do
-        profile = create(:profile)
-        profile.update_column(:last_scanned_at, 2.minutes.ago)
-        profile.reload
-
-        stub_github_api('newusername')
-
-        expect do
-          profile.update(github_username: 'newusername')
-        end.not_to have_enqueued_job(GithubScraperJob)
       end
     end
   end

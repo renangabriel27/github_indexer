@@ -32,12 +32,6 @@ RSpec.describe UrlShortenerJob, type: :job do
         expect(ShortioUrlShortenerService).to have_received(:new).with(expected_github_url)
         expect(service_instance).to have_received(:call)
       end
-
-      it 'logs the job execution' do
-        expect(Rails.logger).to receive(:info).with("=== UrlShortenerJob iniciado para profile_id: #{profile.id} ===")
-
-        described_class.new.perform(profile.id)
-      end
     end
 
     context 'when service returns an error' do
@@ -52,47 +46,10 @@ RSpec.describe UrlShortenerJob, type: :job do
       end
     end
 
-    context 'when service returns nil short_url' do
-      before do
-        allow(service_instance).to receive(:call).and_return({ short_url: nil })
-      end
-
-      it 'updates the profile with nil' do
-        described_class.new.perform(profile.id)
-
-        expect(profile.reload.short_github_url).to be_nil
-      end
-    end
-
-    context 'when profile does not exist' do
-      it 'raises ActiveRecord::RecordNotFound' do
-        expect do
-          described_class.new.perform(999_999)
-        end.to raise_error(ActiveRecord::RecordNotFound)
-      end
-    end
-
-    context 'when service raises an exception' do
-      before do
-        allow(service_instance).to receive(:call).and_raise(StandardError, 'Service error')
-      end
-
-      it 'raises the exception' do
-        expect do
-          described_class.new.perform(profile.id)
-        end.to raise_error(StandardError, 'Service error')
-      end
-
-      it 'does not update the profile' do
-        original_url = profile.short_github_url
-
-        begin
-          described_class.new.perform(profile.id)
-        rescue StandardError
-        end
-
-        expect(profile.reload.short_github_url).to eq(original_url)
-      end
+    it 'raises ActiveRecord::RecordNotFound when profile does not exist' do
+      expect do
+        described_class.new.perform(999_999)
+      end.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 end

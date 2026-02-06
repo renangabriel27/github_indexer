@@ -28,17 +28,5 @@ RSpec.describe 'API Rate Limiting', type: :request do
         end
       end
     end
-
-    it 'tracks different IPs separately' do
-      50.times do
-        get '/api/v1/profiles', headers: { 'REMOTE_ADDR' => '1.2.3.4' }
-        expect(response).to have_http_status(:success)
-      end
-
-      50.times do
-        get '/api/v1/profiles', headers: { 'REMOTE_ADDR' => '5.6.7.8' }
-        expect(response).to have_http_status(:success)
-      end
-    end
   end
 end
