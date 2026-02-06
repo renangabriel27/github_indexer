@@ -4,10 +4,17 @@ require 'rails_helper'
 
 RSpec.describe RescanProfileJob, type: :job do
   include_context 'Profile GitHub API stubs'
+  include_context 'Ferrum browser setup'
 
   describe '#perform' do
     context 'when profile can be rescanned' do
       let(:profile) { create(:profile, last_scanned_at: 10.minutes.ago, scraping_status: :completed) }
+
+      before do
+        allow_any_instance_of(Profiles::ScraperService).to receive(:call).and_return(
+          Dry::Monads::Success(profile)
+        )
+      end
 
       it 'updates scraping_status and processes the profile' do
         initial_status = profile.scraping_status
@@ -37,6 +44,12 @@ RSpec.describe RescanProfileJob, type: :job do
 
     context 'when profile has never been scanned' do
       let(:profile) { create(:profile, last_scanned_at: nil, scraping_status: :pending) }
+
+      before do
+        allow_any_instance_of(Profiles::ScraperService).to receive(:call).and_return(
+          Dry::Monads::Success(profile)
+        )
+      end
 
       it 'processes the profile' do
         initial_status = profile.scraping_status

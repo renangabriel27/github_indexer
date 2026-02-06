@@ -17,6 +17,8 @@ development:
 test:
   <<: *default
   database: github_indexer_test
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  min_messages: WARNING
 
 production:
   <<: *default
