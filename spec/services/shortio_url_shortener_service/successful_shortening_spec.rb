@@ -38,8 +38,8 @@ RSpec.describe ShortioUrlShortenerService, '#call - successful shortening' do
     it 'returns success with short URL' do
       result = service.call
 
-      expect(result).to eq(
-        success: true,
+      expect(result).to be_success
+      expect(result.value!).to eq(
         short_url: short_url,
         original_url: long_url
       )

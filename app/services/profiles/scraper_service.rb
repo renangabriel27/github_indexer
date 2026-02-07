@@ -1,262 +1,46 @@
+# frozen_string_literal: true
+
 module Profiles
   class ScraperService < ApplicationService
-    GITHUB_HEADERS = {
-      "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-      "Accept-Language" => "en-US,en;q=0.9"
-    }.freeze
-
     def initialize(profile, update_name: false)
       @profile = profile
       @github_url = "https://www.github.com/#{profile.github_username}"
       @update_name = update_name
+      @error_handler = GithubScraperErrorHandler.new(profile)
     end
 
     def call
       @profile.update(scraping_status: :processing)
-      Success(fetch_profile_with_js)
+      Success(perform_scraping)
     rescue ProfileNotFoundError => e
-      @profile.update(
-        scraping_status: :failed,
-        last_error: "Perfil não encontrado",
-        last_scanned_at: Time.current
-      )
-      Failure(e.message)
+      @error_handler.handle_not_found_error(e)
     rescue StandardError => e
-      error_message = standardize_error_message(e)
-      @profile.update(
-        scraping_status: :failed,
-        last_error: error_message,
-        last_scanned_at: Time.current
-      )
-      Failure(error_message)
+      @error_handler.handle_standard_error(e)
     end
 
     private
 
-    def fetch_profile_with_js
-      @browser = setup_browser
+    def perform_scraping
+      browser_manager = GithubBrowserManager.new
 
-      @browser.go_to(@github_url)
-
-      check_http_status
-      wait_for_contributions
-
-      html = @browser.body
-      parsed_data = parse_page(html)
-      parsed_data.delete(:name) unless @update_name
-
-      @profile.update!(parsed_data.merge(
-        scraping_status: :completed,
-        last_scanned_at: Time.current,
-        last_error: nil
-      ))
-
-      @profile
-    ensure
-      @browser&.quit
-    end
-
-    def setup_browser
-      Ferrum::Browser.new(
-        headless: true,
-        timeout: 30,
-        browser_options: {
-          'no-sandbox': nil,
-          'disable-dev-shm-usage': nil
-        }
-      )
-    end
-
-    def wait_for_contributions
-      found = wait_for_element(@browser, 'h2[id*="contribution"]', timeout: 10)
-      unless found
-        Rails.logger.warn("Contribuições não carregadas a tempo para #{@profile.github_username}, continuando parsing...")
-      end
-      found
-    end
-
-    def parse_page(html)
-      doc = Nokogiri::HTML(html)
-
-      {
-        name: extract_name(doc),
-        github_username: extract_username(doc),
-        followers: extract_followers(doc),
-        following: extract_following(doc),
-        stars: extract_stars(doc),
-        contributions_last_year: extract_contributions(doc),
-        avatar_url: extract_avatar(doc),
-        location: extract_location(doc),
-        organizations: extract_organizations(doc)
-      }
-    end
-
-    def extract_name(doc)
-      name = doc.at_css('[itemprop="name"]')&.text&.strip
-      name || doc.at_css(".p-name")&.text&.strip
-    end
-
-    def extract_username(doc)
-      username = doc.at_css('[itemprop="additionalName"]')&.text&.strip
-      username || doc.at_css(".vcard-username")&.text&.strip
-    end
-
-    def extract_followers(doc)
-      link = doc.at_css('a[href*="tab=followers"]')
-      return 0 unless link
-
-      number_text = link.at_css(".text-bold")&.text&.strip
-      parse_number(number_text)
-    end
-
-    def extract_following(doc)
-      link = doc.at_css('a[href*="tab=following"]')
-      return 0 unless link
-
-      number_text = link.at_css(".text-bold")&.text&.strip
-      parse_number(number_text)
-    end
-
-    def extract_stars(doc)
-      link = doc.at_css('a[href*="tab=stars"]')
-      return 0 unless link
-
-      counter = link.at_css('[data-view-component="true"][class*="Counter"]')&.text&.strip
-      counter ||= link.text.scan(/\d+/).first
-
-      parse_number(counter)
-    end
-
-    def extract_contributions(doc)
-      node = doc.at_css('h2#js-contribution-activity-description, h2[id*="contribution"]')
-      return 0 unless node
-
-      text = node.text.gsub(/\s+/, " ").strip
-      number = text[/[\d,.]+/]
-
-      return 0 unless number
-      number.delete(".,").to_i
-    end
-
-    def extract_avatar(doc)
-      avatar = doc.at_css(".avatar-user")&.[]("src")
-      avatar ||= doc.at_css('meta[property="og:image"]')&.[]("content")
-
-      avatar = normalize_url(avatar)
-      avatar&.gsub(/s=64&/, "")
-    end
-
-    def extract_location(doc)
-      location_item = doc.at_css('[itemprop="homeLocation"]')
-      return nil unless location_item
-      location_item.at_css(".p-label")&.text&.strip
-    end
-
-    def extract_organizations(doc)
-      orgs = []
-
-      doc.css('a[itemprop="follows"]').each do |org_link|
-        org_name = org_link["aria-label"]
-        org_name ||= org_link.at_css("img")&.[]("alt")&.sub("@", "")
-
-        orgs << org_name if org_name.present?
-      end
-
-      orgs.uniq
-    end
-
-    def wait_for_element(browser, selector, timeout: 10)
-      elapsed = 0
-      interval = 0.5
-
-      while elapsed < timeout
-        return true if browser.at_css(selector)
-        sleep interval
-        elapsed += interval
-      end
-
-      Rails.logger.warn("Elemento #{selector} não encontrado após #{timeout}s")
-      false
-    end
-
-    def parse_number(text)
-      return 0 if text.blank?
-
-      clean_text = text.gsub(/[,\s]/, "")
-
-      multiplier = case clean_text.downcase
-      when /k$/i then 1_000
-      when /m$/i then 1_000_000
-      else 1
-      end
-
-      number = clean_text.gsub(/[^\d.]/, "").to_f
-      (number * multiplier).to_i
-    end
-
-    def normalize_url(url)
-      return nil if url.blank?
-      return url if url.start_with?("http")
-      return "https:#{url}" if url.start_with?("//")
-
-      "https://github.com#{url}"
-    end
-
-    def check_http_status
       begin
-        status = @browser.status if @browser.respond_to?(:status)
+        browser_manager.navigate_to(@github_url)
+        GithubPageValidator.new(browser_manager.browser).validate!
+        browser_manager.wait_for_contributions(username: @profile.github_username)
 
-        if status == 404
-          raise ProfileNotFoundError, "Perfil não encontrado (404)"
-        elsif status && status >= 400
-          raise StandardError, "Erro HTTP #{status} ao acessar perfil"
-        end
-      rescue NoMethodError
-      end
+        parsed_data = GithubHtmlParser.new(browser_manager.html, update_name: @update_name).parse
 
-      html = @browser.body
+        @profile.update!(
+          **parsed_data,
+          scraping_status: :completed,
+          last_scanned_at: Time.current,
+          last_error: nil
+        )
 
-      title = @browser.at_css("title")&.text&.downcase || ""
-      if title.include?("404") || title.include?("not found")
-        raise ProfileNotFoundError, "Perfil não encontrado"
-      end
-
-      has_profile_elements = html.include?("vcard-username") ||
-                            html.include?("avatar-user") ||
-                            html.include?("p-name") ||
-                            html.include?("itemprop=\"name\"")
-
-      unless has_profile_elements
-        error_indicators = [
-          /this is not the web page you are looking for/i,
-          /there isn't a github pages site here/i,
-          /page not found/i,
-          /404.*not found/i
-        ]
-
-        if error_indicators.any? { |pattern| html.match?(pattern) }
-          raise ProfileNotFoundError, "Perfil não encontrado"
-        end
-      end
-    end
-
-    def standardize_error_message(error)
-      error_msg = error.message.to_s
-
-      case error_msg
-      when /404|not found|não encontrado/i
-        "Perfil não encontrado"
-      when /timeout|timed out/i
-        "Timeout ao carregar página do GitHub"
-      when /network|connection|conexão/i
-        "Erro de conexão com GitHub"
-      when /ferrum|browser/i
-        "Erro ao inicializar navegador"
-      else
-        "Erro ao processar perfil: #{error_msg}"
+        @profile
+      ensure
+        browser_manager.quit
       end
     end
   end
-
-  class ProfileNotFoundError < StandardError; end
 end

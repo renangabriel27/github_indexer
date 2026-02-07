@@ -23,7 +23,8 @@ RSpec.describe Profiles::ScraperService, '#call - error scenarios' do
       result = service.call
 
       expect(result).to be_failure
-      expect(result.failure).to include('Perfil não encontrado')
+      expect(result.failure[:error]).to eq(:profile_not_found)
+      expect(result.failure[:message]).to include('Perfil não encontrado')
     end
 
     it 'updates status to failed' do

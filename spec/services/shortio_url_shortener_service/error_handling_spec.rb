@@ -16,7 +16,10 @@ RSpec.describe ShortioUrlShortenerService, '#call - error handling' do
 
       result = service.call
 
-      expect(result).to eq(success: false, error: 'Invalid URL format')
+      expect(result).to be_failure
+      expect(result.failure[:error]).to eq(:unknown)
+      expect(result.failure[:message]).to eq('Unexpected response: 400')
+      expect(result.failure[:retryable]).to be false
     end
 
     it 'returns error for status 401 Unauthorized' do
@@ -29,7 +32,10 @@ RSpec.describe ShortioUrlShortenerService, '#call - error handling' do
 
       result = service.call
 
-      expect(result).to eq(success: false, error: 'Invalid API Key')
+      expect(result).to be_failure
+      expect(result.failure[:error]).to eq(:authentication_failed)
+      expect(result.failure[:message]).to eq('Invalid API Key')
+      expect(result.failure[:retryable]).to be false
     end
 
     it 'returns error for status 429 Rate Limit Exceeded' do
@@ -42,7 +48,10 @@ RSpec.describe ShortioUrlShortenerService, '#call - error handling' do
 
       result = service.call
 
-      expect(result).to eq(success: false, error: 'Rate limit exceeded')
+      expect(result).to be_failure
+      expect(result.failure[:error]).to eq(:rate_limit_exceeded)
+      expect(result.failure[:message]).to eq('Rate limit exceeded')
+      expect(result.failure[:retryable]).to be true
     end
 
     it 'returns error for unexpected status code' do
@@ -55,7 +64,10 @@ RSpec.describe ShortioUrlShortenerService, '#call - error handling' do
 
       result = service.call
 
-      expect(result).to eq(success: false, error: 'Unexpected response: 500')
+      expect(result).to be_failure
+      expect(result.failure[:error]).to eq(:unknown)
+      expect(result.failure[:message]).to eq('Unexpected response: 500')
+      expect(result.failure[:retryable]).to be false
     end
   end
 
@@ -70,7 +82,9 @@ RSpec.describe ShortioUrlShortenerService, '#call - error handling' do
 
       result = service.call
 
-      expect(result).to eq(success: false, error: 'Invalid JSON response')
+      expect(result).to be_failure
+      expect(result.failure[:error]).to eq(:unknown)
+      expect(result.failure[:retryable]).to be false
     end
   end
 
@@ -80,8 +94,10 @@ RSpec.describe ShortioUrlShortenerService, '#call - error handling' do
 
       result = service.call
 
-      expect(result[:success]).to be false
-      expect(result[:error]).to include('Timeout')
+      expect(result).to be_failure
+      expect(result.failure[:error]).to eq(:timeout)
+      expect(result.failure[:message]).to eq('Request timeout')
+      expect(result.failure[:retryable]).to be true
     end
   end
 end

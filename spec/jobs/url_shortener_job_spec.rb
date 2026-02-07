@@ -6,50 +6,86 @@ RSpec.describe UrlShortenerJob, type: :job do
   include_context 'Profile GitHub API stubs'
 
   describe '#perform' do
-    let(:profile) { create(:profile, github_username: 'testuser') }
+    let(:profile) { create(:profile, github_username: 'testuser', short_github_url: nil) }
     let(:expected_github_url) { "https://github.com/#{profile.github_username}" }
     let(:short_url) { 'https://go.short.io/abc123' }
-    let(:service_instance) { instance_double(ShortioUrlShortenerService) }
 
-    before do
-      allow(ShortioUrlShortenerService).to receive(:new).with(expected_github_url).and_return(service_instance)
-    end
+    context 'when profile exists' do
+      context 'when service returns success' do
+        before do
+          allow(ShortioUrlShortenerService).to receive(:call)
+            .with(expected_github_url)
+            .and_return(Dry::Monads::Success(short_url: short_url, original_url: expected_github_url))
+        end
 
-    context 'when service returns a short URL successfully' do
-      before do
-        allow(service_instance).to receive(:call).and_return({ short_url: short_url })
-      end
+        it 'updates the profile with the short URL' do
+          expect do
+            described_class.new.perform(profile.id)
+          end.to change { profile.reload.short_github_url }.to(short_url)
+        end
 
-      it 'updates the profile with the short URL' do
-        expect do
+        it 'calls ShortioUrlShortenerService with the correct GitHub URL' do
           described_class.new.perform(profile.id)
-        end.to change { profile.reload.short_github_url }.to(short_url)
+
+          expect(ShortioUrlShortenerService).to have_received(:call).with(expected_github_url)
+        end
       end
 
-      it 'calls ShortioUrlShortenerService with the correct GitHub URL' do
-        described_class.new.perform(profile.id)
+      context 'when service returns a retryable error' do
+        before do
+          allow(ShortioUrlShortenerService).to receive(:call)
+            .and_return(Dry::Monads::Failure(error: :timeout, message: 'Request timeout', retryable: true))
+        end
 
-        expect(ShortioUrlShortenerService).to have_received(:new).with(expected_github_url)
-        expect(service_instance).to have_received(:call)
+        it 'raises StandardError to trigger retry' do
+          expect do
+            described_class.new.perform(profile.id)
+          end.to raise_error(StandardError, 'Request timeout')
+        end
+
+        it 'does not update the profile' do
+          expect do
+            described_class.new.perform(profile.id) rescue nil
+          end.not_to change { profile.reload.short_github_url }
+        end
+      end
+
+      context 'when service returns a non-retryable error' do
+        before do
+          allow(ShortioUrlShortenerService).to receive(:call)
+            .and_return(Dry::Monads::Failure(error: :authentication_failed, message: 'Invalid API Key', retryable: false))
+        end
+
+        it 'does not raise an error' do
+          expect do
+            described_class.new.perform(profile.id)
+          end.not_to raise_error
+        end
+
+        it 'does not update the profile' do
+          expect do
+            described_class.new.perform(profile.id)
+          end.not_to change { profile.reload.short_github_url }
+        end
       end
     end
 
-    context 'when service returns an error' do
-      before do
-        allow(service_instance).to receive(:call).and_return({ success: false, error: 'API Error' })
+    context 'when profile does not exist' do
+      it 'does not raise an error' do
+        expect do
+          described_class.new.perform(999_999)
+        end.not_to raise_error
       end
 
-      it 'updates the profile with nil short_url' do
-        described_class.new.perform(profile.id)
-
-        expect(profile.reload.short_github_url).to be_nil
-      end
-    end
-
-    it 'raises ActiveRecord::RecordNotFound when profile does not exist' do
-      expect do
+      it 'logs a warning' do
+        expect(Rails.logger).to receive(:warn).with(/Profile#999999 not found/)
         described_class.new.perform(999_999)
-      end.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it 'does not call the service' do
+        expect(ShortioUrlShortenerService).not_to receive(:call)
+        described_class.new.perform(999_999)
+      end
     end
   end
 end

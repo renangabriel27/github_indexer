@@ -1,8 +1,14 @@
-class ShortioUrlShortenerService
+# frozen_string_literal: true
+
+class ShortioUrlShortenerService < ApplicationService
   include HTTParty
   base_uri "https://api.short.io/links"
 
   TIMEOUT = 5
+
+  class RateLimitExceededError < StandardError; end
+  class ApiAuthenticationError < StandardError; end
+  class DuplicateLinkError < StandardError; end
 
   def initialize(long_url)
     @long_url = long_url
@@ -11,31 +17,43 @@ class ShortioUrlShortenerService
   end
 
   def call
-    parse_response(shorten_with_retry)
+    response = make_request
+    check_rate_limit(response)
+    parse_successful_response(response)
+  rescue RateLimitExceededError => e
+    Failure(error: :rate_limit_exceeded, message: e.message, retryable: true)
+  rescue ApiAuthenticationError => e
+    Failure(error: :authentication_failed, message: e.message, retryable: false)
+  rescue DuplicateLinkError => e
+    Failure(error: :duplicate_link, message: e.message, retryable: false)
+  rescue Net::OpenTimeout, Net::ReadTimeout => e
+    Failure(error: :timeout, message: "Request timeout", retryable: true)
   rescue StandardError => e
-    handle_error(e)
+    Rails.logger.error("ShortioUrlShortenerService error: #{e.message}")
+    Failure(error: :unknown, message: e.message, retryable: false)
   end
 
   private
 
-  def shorten_with_retry
-    begin
-      make_request
-    rescue Net::OpenTimeout, Net::ReadTimeout
-      raise "Timeout after retries"
+  def make_request
+    response = self.class.post("/public", body: request_body.to_json, headers: headers, timeout: TIMEOUT)
+    validate_response!(response)
+    response
+  end
+
+  def validate_response!(response)
+    case response.code
+    when 200, 201 then nil
+    when 401 then raise ApiAuthenticationError, "Invalid API Key"
+    when 409 then raise DuplicateLinkError, "Link already exists"
+    when 429 then raise RateLimitExceededError, "Rate limit exceeded"
+    else raise StandardError, "Unexpected response: #{response.code}"
     end
   end
 
-  def make_request
-    response = self.class.post(
-      "/public",
-      body: request_body.to_json,
-      headers: headers,
-      timeout: TIMEOUT
-    )
-
-    check_rate_limit(response)
-    response
+  def parse_successful_response(response)
+    data = response.parsed_response
+    Success(short_url: data["shortURL"], original_url: data["originalURL"])
   end
 
   def request_body
@@ -60,38 +78,5 @@ class ShortioUrlShortenerService
     if remaining < 10
       Rails.logger.warn("Short.io rate limit low: #{remaining} remaining")
     end
-  end
-
-  def parse_response(response)
-    case response.code
-    when 200, 201
-      data = response.parsed_response
-      {
-        success: true,
-        short_url: data["shortURL"],
-        original_url: data["originalURL"]
-      }
-    when 400
-      error_message = response.parsed_response["error"] || "Bad Request"
-      { success: false, error: error_message }
-    when 401
-      { success: false, error: "Invalid API Key" }
-    when 409
-      # Link já existe
-      { success: false, error: "Duplicate link", allow_retry: false }
-    when 429
-      { success: false, error: "Rate limit exceeded" }
-    else
-      { success: false, error: "Unexpected response: #{response.code}" }
-    end
-  rescue JSON::ParserError
-    { success: false, error: "Invalid JSON response" }
-  end
-
-  def handle_error(error)
-    Rails.logger.error("ShortioUrlShortenerService error: #{error.message}")
-    Rails.logger.error(error.backtrace.join("\n"))
-
-    { success: false, error: error.message }
   end
 end
