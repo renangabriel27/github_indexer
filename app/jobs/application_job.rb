@@ -44,7 +44,7 @@ class ApplicationJob < ActiveJob::Base
   end
 
   def build_log_message(job_name, event, details)
-    parts = ["[#{job_name}]", event.to_s]
+    parts = [ "[#{job_name}]", event.to_s ]
 
     details.each do |key, value|
       parts << "#{key}=#{value}" if value.present?

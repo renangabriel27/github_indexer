@@ -59,7 +59,7 @@ RSpec.describe Profiles::GithubHtmlParser do
         expect(result[:contributions_last_year]).to eq(4123)
         expect(result[:avatar_url]).to eq('https://avatars.githubusercontent.com/u/1024025?v=4')
         expect(result[:location]).to eq('Portland, OR')
-        expect(result[:organizations]).to eq(['Linux Foundation', 'torvalds-org'])
+        expect(result[:organizations]).to eq([ 'Linux Foundation', 'torvalds-org' ])
       end
     end
 
@@ -181,12 +181,12 @@ RSpec.describe Profiles::GithubHtmlParser do
     end
 
     [
-      ['1k', 1_000],
-      ['7.7k', 7_700],
-      ['1.2M', 1_200_000],
-      ['500', 500],
-      ['1,234', 1_234],
-      ['1,234,567', 1_234_567]
+      [ '1k', 1_000 ],
+      [ '7.7k', 7_700 ],
+      [ '1.2M', 1_200_000 ],
+      [ '500', 500 ],
+      [ '1,234', 1_234 ],
+      [ '1,234,567', 1_234_567 ]
     ].each do |input, expected|
       it "parses '#{input}' as #{expected}" do
         parser = described_class.new(html_template.call(input))
@@ -247,7 +247,7 @@ RSpec.describe Profiles::GithubHtmlParser do
     subject(:parser) { described_class.new(html_with_orgs) }
 
     it 'extracts unique organizations' do
-      expect(parser.parse[:organizations]).to eq(['Ruby on Rails', 'github', 'Duplicate Org'])
+      expect(parser.parse[:organizations]).to eq([ 'Ruby on Rails', 'github', 'Duplicate Org' ])
     end
 
     it 'prefers aria-label over img alt' do

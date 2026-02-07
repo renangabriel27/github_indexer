@@ -10,7 +10,7 @@ class UrlShortenerJob < ApplicationJob
     when ShortioUrlShortenerService::RateLimitExceededError
       60 + rand(30)  # 60-90 seconds
     when Net::OpenTimeout, Net::ReadTimeout
-      [30, 120, 300][count - 1] || 300
+      [ 30, 120, 300 ][count - 1] || 300
     else
       :kill  # Don't retry for other errors
     end

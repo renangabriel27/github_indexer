@@ -38,7 +38,7 @@ module Ui
     end
 
     def classes
-      [base_classes, variant_classes].compact.join(" ")
+      [ base_classes, variant_classes ].compact.join(" ")
     end
 
     def dot_color
@@ -46,13 +46,13 @@ module Ui
     end
 
     def ping_classes
-      classes = ["animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"]
+      classes = [ "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" ]
       classes << dot_color.gsub("bg-", "bg-").gsub("-500", "-400")
       classes.join(" ")
     end
 
     def dot_classes
-      classes = ["relative inline-flex rounded-full h-2 w-2"]
+      classes = [ "relative inline-flex rounded-full h-2 w-2" ]
       classes << dot_color
       classes.join(" ")
     end

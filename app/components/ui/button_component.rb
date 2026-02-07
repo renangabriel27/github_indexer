@@ -30,7 +30,7 @@ module Ui
     end
 
     def classes
-      [base_classes, variant_classes, html_options[:class]].compact.join(" ")
+      [ base_classes, variant_classes, html_options[:class] ].compact.join(" ")
     end
 
     def link?

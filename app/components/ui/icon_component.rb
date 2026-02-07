@@ -68,7 +68,7 @@ module Ui
     end
 
     def classes
-      [size_class, css_class].compact.join(" ")
+      [ size_class, css_class ].compact.join(" ")
     end
 
     def viewbox
@@ -77,11 +77,11 @@ module Ui
 
     def fill_type
       # GitHub and star icons use fill, others use stroke
-      [:github, :star].include?(name) ? "currentColor" : "none"
+      [ :github, :star ].include?(name) ? "currentColor" : "none"
     end
 
     def stroke_type
-      [:github, :star].include?(name) ? "none" : "currentColor"
+      [ :github, :star ].include?(name) ? "none" : "currentColor"
     end
   end
 end

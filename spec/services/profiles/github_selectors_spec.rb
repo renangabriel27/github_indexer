@@ -5,11 +5,11 @@ require 'rails_helper'
 RSpec.describe Profiles::GithubSelectors do
   describe 'selector constants' do
     it 'defines NAME_SELECTORS' do
-      expect(described_class::NAME_SELECTORS).to eq(['[itemprop="name"]', '.p-name'])
+      expect(described_class::NAME_SELECTORS).to eq([ '[itemprop="name"]', '.p-name' ])
     end
 
     it 'defines USERNAME_SELECTORS' do
-      expect(described_class::USERNAME_SELECTORS).to eq(['[itemprop="additionalName"]', '.vcard-username'])
+      expect(described_class::USERNAME_SELECTORS).to eq([ '[itemprop="additionalName"]', '.vcard-username' ])
     end
 
     it 'defines statistics selectors' do
@@ -25,7 +25,7 @@ RSpec.describe Profiles::GithubSelectors do
     end
 
     it 'defines profile detail selectors' do
-      expect(described_class::AVATAR_SELECTORS).to eq(['.avatar-user', 'meta[property="og:image"]'])
+      expect(described_class::AVATAR_SELECTORS).to eq([ '.avatar-user', 'meta[property="og:image"]' ])
       expect(described_class::LOCATION_CONTAINER).to eq('[itemprop="homeLocation"]')
       expect(described_class::LOCATION_LABEL).to eq('.p-label')
       expect(described_class::ORGANIZATIONS_LINKS).to eq('a[itemprop="follows"]')

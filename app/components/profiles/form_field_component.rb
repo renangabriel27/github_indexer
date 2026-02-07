@@ -67,7 +67,7 @@ module Profiles
         "border-slate-600 focus:ring-indigo-500/50 focus:border-indigo-500"
       end
 
-      [base, padding, border_color].join(" ")
+      [ base, padding, border_color ].join(" ")
     end
 
     def error_container_classes
@@ -81,6 +81,5 @@ module Profiles
     def help_text_classes
       "text-gray-500"
     end
-
   end
 end

@@ -3,8 +3,8 @@
 module Profiles
   class GithubSelectors
     # Profile identification
-    NAME_SELECTORS = ['[itemprop="name"]', '.p-name'].freeze
-    USERNAME_SELECTORS = ['[itemprop="additionalName"]', '.vcard-username'].freeze
+    NAME_SELECTORS = [ '[itemprop="name"]', ".p-name" ].freeze
+    USERNAME_SELECTORS = [ '[itemprop="additionalName"]', ".vcard-username" ].freeze
 
     # Statistics
     FOLLOWERS_LINK = 'a[href*="tab=followers"]'.freeze
@@ -13,18 +13,18 @@ module Profiles
     CONTRIBUTIONS_HEADING = 'h2#js-contribution-activity-description, h2[id*="contribution"]'.freeze
 
     # Counter elements
-    BOLD_TEXT = '.text-bold'.freeze
+    BOLD_TEXT = ".text-bold".freeze
     COUNTER_COMPONENT = '[data-view-component="true"][class*="Counter"]'.freeze
 
     # Profile details
-    AVATAR_SELECTORS = ['.avatar-user', 'meta[property="og:image"]'].freeze
+    AVATAR_SELECTORS = [ ".avatar-user", 'meta[property="og:image"]' ].freeze
     LOCATION_CONTAINER = '[itemprop="homeLocation"]'.freeze
-    LOCATION_LABEL = '.p-label'.freeze
+    LOCATION_LABEL = ".p-label".freeze
     ORGANIZATIONS_LINKS = 'a[itemprop="follows"]'.freeze
 
     # Page validation
-    TITLE_TAG = 'title'.freeze
-    PROFILE_ELEMENT_MARKERS = ['vcard-username', 'avatar-user', 'p-name', 'itemprop="name"'].freeze
+    TITLE_TAG = "title".freeze
+    PROFILE_ELEMENT_MARKERS = [ "vcard-username", "avatar-user", "p-name", 'itemprop="name"' ].freeze
 
     # Error patterns
     ERROR_PATTERNS = [

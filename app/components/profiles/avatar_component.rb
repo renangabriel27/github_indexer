@@ -30,19 +30,19 @@ module Profiles
     end
 
     def avatar_classes
-      classes = ["relative rounded-full ring-4 ring-slate-700"]
+      classes = [ "relative rounded-full ring-4 ring-slate-700" ]
       classes << size_config[:container]
       classes.join(" ")
     end
 
     def placeholder_classes
-      classes = ["relative rounded-full ring-4 ring-slate-700 bg-slate-700 flex items-center justify-center"]
+      classes = [ "relative rounded-full ring-4 ring-slate-700 bg-slate-700 flex items-center justify-center" ]
       classes << size_config[:container]
       classes.join(" ")
     end
 
     def initial_classes
-      classes = ["text-gray-400"]
+      classes = [ "text-gray-400" ]
       classes << size_config[:text]
       classes.join(" ")
     end

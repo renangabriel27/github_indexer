@@ -12,7 +12,7 @@ module Profiles
     end
 
     def container_classes
-      classes = ["flex items-center gap-3 text-gray-400"]
+      classes = [ "flex items-center gap-3 text-gray-400" ]
       classes << "hidden" unless show
       classes.join(" ")
     end

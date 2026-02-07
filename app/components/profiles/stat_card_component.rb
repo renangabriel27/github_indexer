@@ -40,13 +40,13 @@ module Profiles
     end
 
     def container_classes
-      classes = ["bg-slate-900/50 rounded-xl p-6 text-center hover:bg-slate-900 transition-colors"]
+      classes = [ "bg-slate-900/50 rounded-xl p-6 text-center hover:bg-slate-900 transition-colors" ]
       classes << "relative group" if config[:tooltip]
       classes.join(" ")
     end
 
     def icon_classes
-      classes = ["w-8 h-8 mx-auto mb-3"]
+      classes = [ "w-8 h-8 mx-auto mb-3" ]
       classes << config[:color]
       classes.join(" ")
     end

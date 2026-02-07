@@ -33,7 +33,7 @@ module Profiles
     end
 
     def location_container_classes
-      classes = ["inline-flex items-center gap-1.5 text-gray-400"]
+      classes = [ "inline-flex items-center gap-1.5 text-gray-400" ]
       classes << "hidden" unless profile.location.present?
       classes.join(" ")
     end

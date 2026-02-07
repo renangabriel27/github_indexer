@@ -113,7 +113,7 @@ RSpec.describe Profiles::GithubPageValidator do
         allow(browser).to receive(:at_css).with('title').and_return(double(text: 'torvalds - GitHub'))
       end
 
-      ['vcard-username', 'avatar-user', 'p-name', 'itemprop="name"'].each do |marker|
+      [ 'vcard-username', 'avatar-user', 'p-name', 'itemprop="name"' ].each do |marker|
         it "accepts page with #{marker} marker" do
           allow(browser).to receive(:body).and_return("<html><div>#{marker}</div></html>")
           expect { validator.validate! }.not_to raise_error
