@@ -27,7 +27,7 @@ RSpec.describe 'Profiles New', type: :feature do
 
       click_button('Salvar Perfil')
 
-      expect(page).to have_content('Perfil criado!')
+      expect(page).to have_content('Perfil criado com sucesso!')
       expect(page).to have_content('New User')
 
       created_profile = Profile.find_by(github_username: 'newuser')

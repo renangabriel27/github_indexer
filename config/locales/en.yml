@@ -29,3 +29,10 @@
 
 en:
   hello: "Hello world"
+  profiles:
+    messages:
+      created: "Profile created successfully!"
+      updated: "Profile updated successfully!"
+      deleted: "Profile removed successfully!"
+      rescan_started: "Rescan started!"
+      rescan_wait: "Please wait a few minutes before rescanning again"

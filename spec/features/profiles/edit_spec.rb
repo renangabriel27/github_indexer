@@ -33,7 +33,7 @@ RSpec.describe 'Profiles Edit', type: :feature do
       click_button('Atualizar Perfil')
 
       expect(page).to have_current_path(profile_path(profile))
-      expect(page).to have_content('Atualização do perfil em andamento!')
+      expect(page).to have_content('Perfil atualizado com sucesso')
       expect(page).to have_content('Updated Name')
     end
 

@@ -1,4 +1,11 @@
 pt-BR:
+  profiles:
+    messages:
+      created: "Perfil criado com sucesso!"
+      updated: "Perfil atualizado com sucesso!"
+      deleted: "Perfil removido com sucesso!"
+      rescan_started: "Re-escaneamento iniciado!"
+      rescan_wait: "Aguarde alguns minutos antes de re-escanear novamente"
   activerecord:
     models:
       profile: "Perfil"

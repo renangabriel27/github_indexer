@@ -1,13 +1,13 @@
+# frozen_string_literal: true
+
 class ProfilesController < ApplicationController
+  include Paginatable
+
   before_action :set_profile, only: [ :show, :edit, :update, :destroy, :rescan ]
 
   def index
-    profiles = Profile.all
-    search_query = params[:q]
-    profiles = profiles.search(search_query) if search_query.present?
-    profiles = profiles.order(created_at: :desc)
-
-    @pagy, @profiles = pagy(:offset, profiles, offset: calculate_offset, limit: per_page)
+    profiles = ProfilesFilterQuery.call(filter_params)
+    @pagy, @profiles = pagy(:offset, profiles, offset: calculate_offset, limit: per_page(default: 12))
   end
 
   def show
@@ -21,7 +21,7 @@ class ProfilesController < ApplicationController
     result = Profiles::CreatorService.call(profile_params)
 
     if result.success?
-      redirect_to result.value![:profile], notice: "Perfil criado!"
+      redirect_to result.value![:profile], notice: t("profiles.messages.created")
     else
       @profile = result.failure[:profile]
       render :new, status: :unprocessable_entity
@@ -35,7 +35,7 @@ class ProfilesController < ApplicationController
     result = Profiles::UpdaterService.call(@profile, profile_params)
 
     if result.success?
-      redirect_to result.value![:profile], notice: "Atualização do perfil em andamento!"
+      redirect_to result.value![:profile], notice: t("profiles.messages.updated")
     else
       @profile = result.failure[:profile]
       render :edit, status: :unprocessable_entity
@@ -44,33 +44,19 @@ class ProfilesController < ApplicationController
 
   def destroy
     @profile.destroy
-    redirect_to profiles_path, notice: "Removido!"
+    redirect_to profiles_path, notice: t("profiles.messages.deleted"), status: :see_other
   end
 
   def rescan
     if @profile.can_rescan?
       RescanProfileJob.perform_later(@profile.id)
-      redirect_to @profile, notice: "Re-escaneamento iniciado!"
+      redirect_to @profile, notice: t("profiles.messages.rescan_started")
     else
-      redirect_to @profile, alert: "Aguarde antes de re-escanear"
+      redirect_to @profile, alert: t("profiles.messages.rescan_wait")
     end
   end
 
   private
-
-  def calculate_offset
-    return params[:offset].to_i if params[:offset].present?
-
-    page = params[:page].to_i
-    page = 1 if page < 1
-
-    (page - 1) * per_page
-  end
-
-  def per_page
-    requested = params[:per_page].to_i
-    requested.positive? ? [ requested, 100 ].min : 12
-  end
 
   def set_profile
     @profile = Profile.find(params[:id])
@@ -78,5 +64,9 @@ class ProfilesController < ApplicationController
 
   def profile_params
     params.require(:profile).permit(:name, :github_username)
+  end
+
+  def filter_params
+    params.permit(:q, :status, :order)
   end
 end

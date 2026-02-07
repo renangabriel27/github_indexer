@@ -58,7 +58,9 @@ RSpec.describe 'GET /api/v1/profiles/:id', type: :request do
       expect(response.content_type).to include('application/json')
 
       json = JSON.parse(response.body)
-      expect(json['error']).to eq('Not found')
+      expect(json['error']).to be_a(Hash)
+      expect(json['error']['code']).to eq('not_found')
+      expect(json['error']['message']).to include('Couldn\'t find Profile')
     end
   end
 end
