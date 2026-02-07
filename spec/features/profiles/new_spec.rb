@@ -13,6 +13,8 @@ RSpec.describe 'Profiles New', type: :feature do
       expect(page).to have_field('profile[name]')
       expect(page).to have_field('profile[github_username]')
       expect(page).to have_button('Salvar Perfil')
+      expect(page).to have_link('Cancelar')
+      expect(page).to have_link('Voltar para perfis')
     end
   end
 
@@ -40,8 +42,10 @@ RSpec.describe 'Profiles New', type: :feature do
       fill_in 'profile[github_username]', with: ''
       click_button('Salvar Perfil')
 
+      # Should stay on the new page
       expect(page).to have_content('Adicionar Novo Perfil')
-      expect(page).to have_content('erro')
+      # Should show error messages
+      expect(page).to have_content(/erro/i)
     end
 
     it 'displays validation errors for duplicate github_username' do
@@ -52,16 +56,25 @@ RSpec.describe 'Profiles New', type: :feature do
       fill_in 'profile[github_username]', with: 'existinguser'
       click_button('Salvar Perfil')
 
-      expect(page).to have_current_path(profiles_path)
-      expect(page).to have_content(/já está em uso|has already been taken|já foi utilizado/i)
+      # Should stay on the new page with validation errors
+      expect(page).to have_content('Adicionar Novo Perfil')
+      expect(page).to have_content(/já está em uso|has already been taken|já foi utilizado|erro/i)
     end
   end
 
   describe 'navigation' do
-    it 'navigates to profiles index when clicking cancel' do
+    it 'navigates to profiles index when clicking cancel button' do
       visit new_profile_path
 
       click_link('Cancelar')
+
+      expect(page).to have_current_path(profiles_path)
+    end
+
+    it 'navigates to profiles index when clicking back link' do
+      visit new_profile_path
+
+      click_link('Voltar para perfis')
 
       expect(page).to have_current_path(profiles_path)
     end

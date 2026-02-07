@@ -1,0 +1,19 @@
+<div class="<%= container_classes %>">
+  <%= render Ui::IconComponent.new(
+    name: config[:icon],
+    size: :xl,
+    css_class: icon_classes
+  ) %>
+  <p class="text-3xl font-bold text-white mb-1" data-profile-<%= stat_type.to_s.dasherize %>><%= formatted_value %></p>
+  <p class="text-sm text-gray-400"><%= config[:label] %></p>
+
+  <% if show_tooltip? %>
+    <!-- Tooltip -->
+    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+      <%= tooltip_text %>
+      <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+        <div class="border-4 border-transparent border-t-gray-900"></div>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,23 +1,15 @@
-<!-- app/views/profiles/new.html.erb -->
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 py-12">
   <div class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
 
     <!-- Back Button -->
     <div class="mb-6">
-      <%= link_to profiles_path, class: "inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors" do %>
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-        Voltar para perfis
-      <% end %>
+      <%= render Ui::BackLinkComponent.new(text: "Voltar para perfis", href: profiles_path) %>
     </div>
 
     <!-- Header -->
     <div class="text-center mb-8">
       <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl mb-4">
-        <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-        </svg>
+        <%= render Ui::IconComponent.new(name: :user, size: :xl, css_class: "text-white") %>
       </div>
       <h1 class="text-4xl font-bold text-white mb-2">Adicionar Novo Perfil</h1>
       <p class="text-gray-400">Insira seus dados do GitHub para começar a análise</p>

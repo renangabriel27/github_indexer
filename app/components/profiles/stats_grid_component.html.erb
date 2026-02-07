@@ -1,0 +1,5 @@
+<div class="<%= container_classes %>">
+  <% stats.each do |stat| %>
+    <%= render Profiles::StatCardComponent.new(stat_type: stat[:type], value: stat[:value]) %>
+  <% end %>
+</div>

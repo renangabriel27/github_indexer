@@ -1,0 +1,8 @@
+<div role="status" aria-live="polite">
+  <%= render Ui::BadgeComponent.new(
+    text: status_text,
+    variant: variant,
+    show_dot: true,
+    animate_dot: animate?
+  ) %>
+</div>

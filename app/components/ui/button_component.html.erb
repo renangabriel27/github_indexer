@@ -1,0 +1,15 @@
+<% if link? %>
+  <%= link_to href, **link_options do %>
+    <% if icon.present? %>
+      <%= render Ui::IconComponent.new(name: icon, size: :md) %>
+    <% end %>
+    <%= text %>
+  <% end %>
+<% else %>
+  <%= button_tag **button_options do %>
+    <% if icon.present? %>
+      <%= render Ui::IconComponent.new(name: icon, size: :md) %>
+    <% end %>
+    <%= text %>
+  <% end %>
+<% end %>

@@ -1,0 +1,38 @@
+<div class="<%= container_classes %>">
+  <%= form.label attribute, label, class: label_classes %>
+
+  <div class="<%= input_container_classes %>">
+    <% if prefix.present? %>
+      <!-- Prefix (read-only text like "github.com/") -->
+      <div class="<%= prefix_container_classes %>">
+        <span class="<%= prefix_inner_classes %>">
+          <% if icon.present? %>
+            <%= render Ui::IconComponent.new(name: icon, size: :md) %>
+          <% end %>
+          <span class="font-mono text-sm"><%= prefix %></span>
+        </span>
+      </div>
+    <% elsif icon.present? %>
+      <!-- Icon only (no prefix) -->
+      <div class="<%= icon_container_classes %>">
+        <%= render Ui::IconComponent.new(name: icon, size: :md, css_class: "text-gray-500") %>
+      </div>
+    <% end %>
+
+    <%= form.text_field attribute,
+        placeholder: placeholder,
+        class: input_classes %>
+  </div>
+
+  <% if has_errors? %>
+    <p class="<%= error_container_classes %>">
+      <%= render Ui::IconComponent.new(name: :exclamation_circle, size: :sm, css_class: "text-red-400") %>
+      <%= error_message %>
+    </p>
+  <% elsif help_text.present? %>
+    <p class="<%= help_container_classes %>">
+      <%= render Ui::IconComponent.new(name: :info_circle, size: :sm, css_class: "text-gray-500") %>
+      <span class="<%= help_text_classes %>"><%= help_text %></span>
+    </p>
+  <% end %>
+</div>

@@ -1,9 +1,0 @@
-<div class="card">
-  <%= image_tag profile.avatar_url, class: "w-16 h-16 rounded-full" if profile.avatar_url %>
-  <h3 class="font-bold text-lg"><%= profile.name %></h3>
-  <p class="text-gray-600"><%= profile.github_username %></p>
-  <div class="mt-4 flex gap-2">
-    <%= link_to "Ver", profile, class: "btn-secondary" %>
-    <%= link_to "Editar", edit_profile_path(profile), class: "btn-secondary" %>
-  </div>
-</div>

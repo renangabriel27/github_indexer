@@ -1,0 +1,11 @@
+<div class="<%= classes %>">
+  <% if show_dot %>
+    <span class="relative flex h-2 w-2">
+      <% if animate_dot %>
+        <span class="<%= ping_classes %>"></span>
+      <% end %>
+      <span class="<%= dot_classes %>"></span>
+    </span>
+  <% end %>
+  <span><%= text %></span>
+</div>

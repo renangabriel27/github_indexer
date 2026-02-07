@@ -1,0 +1,18 @@
+<div
+  class="<%= container_classes %>"
+  data-controller="flash"
+  data-flash-id-value="<%= flash_id %>"
+  role="alert"
+  aria-live="polite">
+  <div class="flex items-center gap-3">
+    <%= render Ui::IconComponent.new(name: config[:icon], size: :md, css_class: icon_classes) %>
+    <p class="<%= text_classes %>"><%= message %></p>
+  </div>
+  <button
+    type="button"
+    class="<%= button_classes %>"
+    data-action="click->flash#dismiss"
+    aria-label="Dismiss message">
+    <%= render Ui::IconComponent.new(name: :close, size: :md) %>
+  </button>
+</div>

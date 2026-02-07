@@ -1,0 +1,57 @@
+<div data-controller="modal" data-modal-id-value="<%= modal_id %>">
+  <!-- Trigger Button -->
+  <div data-action="click->modal#open">
+    <%= trigger %>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div
+    id="<%= modal_id %>"
+    class="<%= backdrop_classes %>"
+    data-modal-target="backdrop"
+    data-action="click->modal#closeOnBackdrop keydown.esc@window->modal#close"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="<%= modal_id %>-title">
+
+    <!-- Modal Container -->
+    <div class="<%= container_classes %>" data-modal-target="container">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="<%= icon_container_classes %>">
+          <%= render Ui::IconComponent.new(name: :exclamation_triangle, size: :lg, css_class: "text-red-400") %>
+        </div>
+        <div>
+          <h3 id="<%= modal_id %>-title" class="text-lg font-semibold text-white"><%= title %></h3>
+          <% if description %>
+            <p class="text-sm text-gray-400"><%= description %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Custom Content -->
+      <% if body %>
+        <div class="text-gray-300 mb-6">
+          <%= body %>
+        </div>
+      <% end %>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3">
+        <button
+          type="button"
+          data-action="click->modal#close"
+          class="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-lg text-white font-medium transition-colors">
+          <%= cancel_text %>
+        </button>
+
+        <% if confirm_url %>
+          <%= button_to confirm_url,
+              method: confirm_method,
+              class: "flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium transition-colors" do %>
+            <%= confirm_text %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

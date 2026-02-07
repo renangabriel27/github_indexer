@@ -1,0 +1,21 @@
+<%= form_with url: url, method: method, class: "mb-8", data: { controller: "search-debounce", search_debounce_target: "form" } do |f| %>
+  <div class="<%= outer_container_classes %>">
+    <div class="<%= glow_classes %>"></div>
+    <div class="<%= inner_container_classes %>">
+      <div class="<%= icon_container_classes %>">
+        <%= render Ui::IconComponent.new(name: :search, size: :lg, css_class: "text-gray-400") %>
+      </div>
+
+      <%= f.search_field param_name,
+          value: value,
+          placeholder: placeholder,
+          class: input_classes,
+          data: { action: "search-debounce#search" },
+          "aria-label": "Search" %>
+
+      <button type="submit" class="<%= button_classes %>" aria-label="Submit search">
+        <%= render Ui::IconComponent.new(name: :arrow_right, size: :lg, css_class: "text-white") %>
+      </button>
+    </div>
+  </div>
+<% end %>
