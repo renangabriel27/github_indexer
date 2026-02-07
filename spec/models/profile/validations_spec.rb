@@ -64,19 +64,6 @@ RSpec.describe Profile, type: :model do
         expect(profile).not_to be_valid
         expect(profile.errors[:github_username]).to include('não pode conter hífens consecutivos')
       end
-
-      it 'rejects organization usernames' do
-        stub_github_api('rails', type: 'Organization')
-        profile = build(:profile, github_username: 'rails')
-        expect(profile).not_to be_valid
-        expect(profile.errors[:github_username]).to include('não pode ser uma organização')
-      end
-
-      it 'handles API errors gracefully' do
-        stub_github_api('invalid', status: 404)
-        profile = build(:profile, github_username: 'invalid')
-        expect { profile.valid? }.not_to raise_error
-      end
     end
   end
 end

@@ -18,11 +18,12 @@ class ProfilesController < ApplicationController
   end
 
   def create
-    @profile = Profile.new(profile_params)
+    result = Profiles::CreatorService.call(profile_params)
 
-    if @profile.save
-      redirect_to @profile, notice: "Perfil criado!"
+    if result.success?
+      redirect_to result.value![:profile], notice: "Perfil criado!"
     else
+      @profile = result.failure[:profile]
       render :new, status: :unprocessable_entity
     end
   end
@@ -31,9 +32,12 @@ class ProfilesController < ApplicationController
   end
 
   def update
-    if @profile.update(profile_params)
-      redirect_to @profile, notice: "Atualizado!"
+    result = Profiles::UpdaterService.call(@profile, profile_params)
+
+    if result.success?
+      redirect_to result.value![:profile], notice: "Atualização do perfil em andamento!"
     else
+      @profile = result.failure[:profile]
       render :edit, status: :unprocessable_entity
     end
   end

@@ -15,14 +15,9 @@ class Profile < ApplicationRecord
     message: "deve ter no máximo 39 caracteres"
   }, if: -> { github_username.present? }
 
-  validate :validate_github_username_format, if: -> { github_username.present? }
-  validate :not_organization, if: :github_username_changed?
+  validates :github_username, github_username_format: true, if: -> { github_username.present? }
 
   before_validation :normalize_github_username
-  before_save :reset_scraping_data, if: :github_username_changed?
-
-  after_create :enqueue_priority_jobs
-  after_update :enqueue_priority_jobs, if: :should_enqueue_jobs?
 
   enum :scraping_status, {
     pending: "pending",
@@ -37,62 +32,8 @@ class Profile < ApplicationRecord
 
   private
 
-  def not_organization
-    return unless github_username.present?
-
-    uri = URI("https://api.github.com/users/#{github_username}")
-    response = Net::HTTP.get_response(uri)
-
-    if response.is_a?(Net::HTTPSuccess)
-      data = JSON.parse(response.body)
-      if data["type"] == "Organization"
-        errors.add(:github_username, "não pode ser uma organização")
-      end
-    end
-  rescue StandardError => e
-    Rails.logger.error("Erro validando GitHub: #{e.message}")
-  end
-
   def normalize_github_username
     return unless github_username.present?
     self.github_username = github_username.strip.downcase
-  end
-
-  def validate_github_username_format
-    return unless github_username.present?
-
-    if github_username.start_with?("-") || github_username.end_with?("-")
-      errors.add(:github_username, "não pode começar ou terminar com hífen")
-    end
-
-    if github_username.include?("--")
-      errors.add(:github_username, "não pode conter hífens consecutivos")
-    end
-  end
-
-  def enqueue_priority_jobs
-    return unless previously_new_record? || can_rescan?
-    enqueue_github_scraper
-    enqueue_github_shortener_url
-  end
-
-  def should_enqueue_jobs?
-    return false if destroyed?
-    saved_change_to_github_username?
-  end
-
-  def enqueue_github_scraper
-    update_name = !previously_new_record?
-    GithubScraperJob.perform_later(self.id, update_name: update_name)
-  end
-
-  def enqueue_github_shortener_url
-    UrlShortenerJob.perform_later(self.id)
-  end
-
-  def reset_scraping_data
-    self.scraping_status = "pending"
-    self.last_scanned_at = nil
-    self.last_error = nil
   end
 end
