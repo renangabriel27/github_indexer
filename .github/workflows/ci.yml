@@ -101,6 +101,10 @@ jobs:
 
       - name: Build Tailwind CSS
         run: bin/rails tailwindcss:build
+        env:
+          RAILS_ENV: test
 
       - name: Run RSpec
         run: bundle exec rspec
+        env:
+          RAILS_ENV: test
