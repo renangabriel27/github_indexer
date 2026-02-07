@@ -10,6 +10,7 @@ gem "propshaft"
 # Frontend
 gem "view_component"
 gem "importmap-rails"
+gem "tailwindcss-rails"
 
 # Scraping
 gem "nokogiri"
