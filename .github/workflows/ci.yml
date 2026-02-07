@@ -99,5 +99,8 @@ jobs:
           bundle exec rails db:create
           bundle exec rails db:schema:load
 
+      - name: Build Tailwind CSS
+        run: bin/rails tailwindcss:build
+
       - name: Run RSpec
         run: bundle exec rspec
