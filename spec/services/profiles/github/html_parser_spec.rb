@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Profiles::GithubHtmlParser do
+RSpec.describe Profiles::Github::HtmlParser do
   let(:html) do
     <<~HTML
       <html>

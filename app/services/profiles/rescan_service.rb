@@ -17,7 +17,7 @@ module Profiles
         )
       end
 
-      Profiles::ScraperService.call(@profile, update_name: true)
+      Profiles::Github::ScraperService.call(@profile, update_name: true)
     end
 
     private

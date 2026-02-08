@@ -13,7 +13,7 @@ RSpec.describe Profiles::RescanService do
         before { profile.update!(last_scanned_at: nil) }
 
         it "returns Success" do
-          allow(Profiles::ScraperService).to receive(:call).and_return(Success({ data: "test" }))
+          allow(Profiles::Github::ScraperService).to receive(:call).and_return(Success({ data: "test" }))
 
           result = described_class.call(profile)
 
@@ -21,11 +21,11 @@ RSpec.describe Profiles::RescanService do
         end
 
         it "delegates to ScraperService with update_name: true" do
-          allow(Profiles::ScraperService).to receive(:call).and_return(Success({ data: "test" }))
+          allow(Profiles::Github::ScraperService).to receive(:call).and_return(Success({ data: "test" }))
 
           described_class.call(profile)
 
-          expect(Profiles::ScraperService).to have_received(:call).with(profile, update_name: true)
+          expect(Profiles::Github::ScraperService).to have_received(:call).with(profile, update_name: true)
         end
       end
 
@@ -33,7 +33,7 @@ RSpec.describe Profiles::RescanService do
         before { profile.update!(last_scanned_at: 6.minutes.ago) }
 
         it "returns Success" do
-          allow(Profiles::ScraperService).to receive(:call).and_return(Success({ data: "test" }))
+          allow(Profiles::Github::ScraperService).to receive(:call).and_return(Success({ data: "test" }))
 
           result = described_class.call(profile)
 
@@ -41,11 +41,11 @@ RSpec.describe Profiles::RescanService do
         end
 
         it "delegates to ScraperService" do
-          allow(Profiles::ScraperService).to receive(:call).and_return(Success({ data: "test" }))
+          allow(Profiles::Github::ScraperService).to receive(:call).and_return(Success({ data: "test" }))
 
           described_class.call(profile)
 
-          expect(Profiles::ScraperService).to have_received(:call).with(profile, update_name: true)
+          expect(Profiles::Github::ScraperService).to have_received(:call).with(profile, update_name: true)
         end
       end
     end
@@ -84,7 +84,7 @@ RSpec.describe Profiles::RescanService do
       end
 
       it "does not call ScraperService" do
-        expect(Profiles::ScraperService).not_to receive(:call)
+        expect(Profiles::Github::ScraperService).not_to receive(:call)
 
         described_class.call(profile)
       end
@@ -95,7 +95,7 @@ RSpec.describe Profiles::RescanService do
 
       it "returns the failure from ScraperService" do
         failure_result = Failure(error: :timeout, message: "Timeout", retryable: true)
-        allow(Profiles::ScraperService).to receive(:call).and_return(failure_result)
+        allow(Profiles::Github::ScraperService).to receive(:call).and_return(failure_result)
 
         result = described_class.call(profile)
 

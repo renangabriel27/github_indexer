@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Profiles::GithubSelectors do
+RSpec.describe Profiles::Github::Selectors do
   describe 'selector constants' do
     it 'defines NAME_SELECTORS' do
       expect(described_class::NAME_SELECTORS).to eq([ '[itemprop="name"]', '.p-name' ])

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Profiles::GithubPageValidator do
+RSpec.describe Profiles::Github::PageValidator do
   let(:browser) { double('Browser') }
   subject(:validator) { described_class.new(browser) }
 

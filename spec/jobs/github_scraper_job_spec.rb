@@ -14,19 +14,19 @@ RSpec.describe GithubScraperJob, type: :job do
         let(:service_result) { Success({ profile: profile, data: "scraped_data" }) }
 
         before do
-          allow(Profiles::ScraperService).to receive(:call).and_return(service_result)
+          allow(Profiles::Github::ScraperService).to receive(:call).and_return(service_result)
         end
 
-        it 'calls Profiles::ScraperService with correct parameters' do
+        it 'calls Profiles::Github::ScraperService with correct parameters' do
           described_class.new.perform(profile.id)
 
-          expect(Profiles::ScraperService).to have_received(:call).with(profile, update_name: false)
+          expect(Profiles::Github::ScraperService).to have_received(:call).with(profile, update_name: false)
         end
 
-        it 'calls Profiles::ScraperService with update_name: true when specified' do
+        it 'calls Profiles::Github::ScraperService with update_name: true when specified' do
           described_class.new.perform(profile.id, update_name: true)
 
-          expect(Profiles::ScraperService).to have_received(:call).with(profile, update_name: true)
+          expect(Profiles::Github::ScraperService).to have_received(:call).with(profile, update_name: true)
         end
 
         it 'logs started event' do
@@ -52,7 +52,7 @@ RSpec.describe GithubScraperJob, type: :job do
         end
 
         before do
-          allow(Profiles::ScraperService).to receive(:call).and_return(service_result)
+          allow(Profiles::Github::ScraperService).to receive(:call).and_return(service_result)
         end
 
         it 'logs failed event' do
@@ -84,7 +84,7 @@ RSpec.describe GithubScraperJob, type: :job do
         end
 
         before do
-          allow(Profiles::ScraperService).to receive(:call).and_return(service_result)
+          allow(Profiles::Github::ScraperService).to receive(:call).and_return(service_result)
         end
 
         it 'logs failed event' do
@@ -115,7 +115,7 @@ RSpec.describe GithubScraperJob, type: :job do
       it 'does not call service' do
         allow(Rails.logger).to receive(:warn)
 
-        expect(Profiles::ScraperService).not_to receive(:call)
+        expect(Profiles::Github::ScraperService).not_to receive(:call)
         described_class.new.perform(999_999)
       end
     end

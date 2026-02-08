@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Profiles::ScraperService, '#call - number parsing' do
+RSpec.describe Profiles::Github::ScraperService, '#call - number parsing' do
   include_context 'Ferrum browser setup'
   include_context 'GitHub HTML fixtures'
   include_context 'Profile GitHub API stubs'
