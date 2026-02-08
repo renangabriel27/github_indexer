@@ -37,15 +37,25 @@ module Profiles
     end
 
     def followers_count
-      profile.followers || 0
+      format_number(profile.followers || 0)
     end
 
     def stars_count
-      profile.stars || 0
+      format_number(profile.stars || 0)
     end
 
     def formatted_date
       l(profile.created_at, format: :short)
+    end
+
+    private
+
+    def format_number(number)
+      return number.to_s if number < 1000
+
+      value = number / 1000.0
+      formatted = value % 1 == 0 ? value.to_i : format("%.1f", value)
+      "#{formatted}k"
     end
   end
 end
