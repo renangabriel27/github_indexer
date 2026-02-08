@@ -5,7 +5,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: github_indexer_development
       SECRET_KEY_BASE: dummy
     ports:
@@ -19,6 +19,8 @@ services:
   web:
     build: .
     command: bash -c "rm -f tmp/pids/server.pid && bin/rails server -b 0.0.0.0"
+    env_file:
+      - .env
     volumes:
       - .:/app
       - bundle_cache:/usr/local/bundle
@@ -28,22 +30,23 @@ services:
       - db
       - redis
     environment:
-      DATABASE_URL: postgres://postgres:password@db:5432/github_indexer_development
+      DATABASE_URL: postgres://postgres:postgres@db:5432/github_indexer_development
       REDIS_URL: redis://redis:6379/0
-      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
 
   sidekiq:
     build: .
     command: bundle exec sidekiq
+    env_file:
+      - .env
     volumes:
       - .:/app
+      - bundle_cache:/usr/local/bundle
     depends_on:
       - db
       - redis
     environment:
-      DATABASE_URL: postgres://postgres:password@db:5432/github_indexer_development
+      DATABASE_URL: postgres://postgres:postgres@db:5432/github_indexer_development
       REDIS_URL: redis://redis:6379/0
-      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
 
 volumes:
   postgres_data:
