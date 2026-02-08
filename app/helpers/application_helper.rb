@@ -1,5 +1,4 @@
 module ApplicationHelper
-  # Gera série de páginas para Pagy::Offset (similar ao pagy.series)
   def pagy_series(pagy)
     current_page = pagy.page
     total_pages = pagy.pages
@@ -28,12 +27,10 @@ module ApplicationHelper
     series
   end
 
-  # Retorna a página anterior ou nil (similar ao pagy.prev)
   def pagy_prev_page(pagy)
     pagy.page > 1 ? pagy.page - 1 : nil
   end
 
-  # Retorna a próxima página ou nil (similar ao pagy.next)
   def pagy_next_page(pagy)
     pagy.page < pagy.pages ? pagy.page + 1 : nil
   end

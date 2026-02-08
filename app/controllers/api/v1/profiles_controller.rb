@@ -9,7 +9,7 @@ module Api::V1
       @pagy, @profiles = pagy(:offset, profiles, offset: calculate_offset, limit: per_page(default: 10))
 
       render json: {
-        data: ProfileSerializer.render_as_hash(@profiles),
+        data: Api::V1::ProfileSerializer.render_as_hash(@profiles),
         meta: pagination_meta(@pagy)
       }
     end
@@ -17,7 +17,7 @@ module Api::V1
     def show
       @profile = Profile.find(params[:id])
       render json: {
-        data: ProfileSerializer.render_as_hash(@profile)
+        data: Api::V1::ProfileSerializer.render_as_hash(@profile)
       }
     end
 
