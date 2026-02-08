@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![CI](https://github.com/renangabriel27/github_indexer/actions/workflows/ci.yml/badge.svg)
+[![CI Status](https://github.com/renangabriel27/github_indexer/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/renangabriel27/github_indexer/actions/workflows/ci.yml)
 ![Ruby](https://img.shields.io/badge/Ruby-4.0.1-red?logo=ruby)
 ![Rails](https://img.shields.io/badge/Rails-8.1.2-red?logo=rubyonrails)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-blue?logo=postgresql)
