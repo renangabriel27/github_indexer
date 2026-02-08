@@ -39,12 +39,17 @@ module Profiles
       private
 
       def setup_browser
+        browser_path = ENV.fetch('CHROME_BIN', '/usr/bin/chromium')
+
         Ferrum::Browser.new(
           headless: true,
           timeout: BROWSER_TIMEOUT,
+          browser_path: browser_path,
           browser_options: {
             'no-sandbox': nil,
-            'disable-dev-shm-usage': nil
+            'disable-dev-shm-usage': nil,
+            'disable-gpu': nil,
+            'disable-software-rasterizer': nil
           }
         )
       end
