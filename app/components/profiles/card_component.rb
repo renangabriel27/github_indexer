@@ -1,0 +1,51 @@
+# frozen_string_literal: true
+
+module Profiles
+  class CardComponent < ViewComponent::Base
+    attr_reader :profile
+
+    def initialize(profile:)
+      @profile = profile
+    end
+
+    def card_classes
+      "group relative bg-slate-800 border border-slate-700 rounded-2xl p-6 hover:bg-slate-750 hover:border-slate-600 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1"
+    end
+
+    def action_button_classes
+      "p-2 bg-slate-700/80 hover:bg-slate-600 border border-slate-600 rounded-lg text-gray-400 hover:text-white transition-all duration-200 hover:scale-110 hover:shadow-lg"
+    end
+
+    def github_link_classes
+      "inline-flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 transition-colors group/link truncate"
+    end
+
+    def username_classes
+      "text-lg font-bold text-white truncate group-hover:text-indigo-400 transition-colors"
+    end
+
+    def stat_classes
+      "flex items-center gap-1.5 text-gray-400"
+    end
+
+    def avatar_url
+      profile.avatar_url || "https://github.com/identicons/#{profile.github_username}.png"
+    end
+
+    def display_name
+      profile.name || profile.github_username
+    end
+
+    def followers_count
+      profile.followers || 0
+    end
+
+    def stars_count
+      profile.stars || 0
+    end
+
+    def formatted_date
+      l(profile.created_at, format: :short)
+    end
+  end
+end

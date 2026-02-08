@@ -1,0 +1,68 @@
+<div class="<%= card_classes %>">
+  <!-- Action Icons - Top Right Corner -->
+  <div class="absolute top-4 right-4 z-10 flex items-center gap-2">
+    <!-- View Icon -->
+    <%= link_to profile_path(profile),
+        class: action_button_classes,
+        onclick: "event.stopPropagation();",
+        title: "Visualizar perfil" do %>
+      <%= render Ui::IconComponent.new(name: :eye, size: :sm) %>
+    <% end %>
+
+    <!-- Edit Icon -->
+    <%= link_to edit_profile_path(profile),
+        class: action_button_classes,
+        onclick: "event.stopPropagation();",
+        title: "Editar perfil" do %>
+      <%= render Ui::IconComponent.new(name: :edit, size: :sm) %>
+    <% end %>
+  </div>
+
+  <%= link_to profile_path(profile), class: "block" do %>
+    <div class="flex items-center gap-4 mb-4">
+      <%= image_tag avatar_url,
+          class: "h-16 w-16 rounded-full ring-2 ring-slate-600 group-hover:ring-indigo-500 transition-all",
+          alt: display_name %>
+
+      <div class="flex-1 min-w-0">
+        <h3 class="<%= username_classes %>">
+          <%= display_name %>
+        </h3>
+        <% if profile.short_github_url.present? %>
+          <a href="<%= profile.short_github_url %>"
+             target="_blank"
+             rel="noopener noreferrer"
+             onclick="event.stopPropagation();"
+             class="<%= github_link_classes %>">
+            <%= render Ui::IconComponent.new(name: :github, size: :sm, css_class: "flex-shrink-0") %>
+            <span class="truncate"><%= profile.github_username %></span>
+            <%= render Ui::IconComponent.new(name: :external_link, size: :sm, css_class: "opacity-0 group-hover/link:opacity-100 transition-opacity flex-shrink-0") %>
+          </a>
+        <% else %>
+          <p class="text-sm text-gray-400 truncate">
+            @<%= profile.github_username %>
+          </p>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4 text-sm">
+      <div class="<%= stat_classes %>">
+        <%= render Ui::IconComponent.new(name: :users, size: :sm) %>
+        <span><%= followers_count %> followers</span>
+      </div>
+
+      <div class="<%= stat_classes %>">
+        <%= render Ui::IconComponent.new(name: :star, size: :sm) %>
+        <span><%= stars_count %> stars</span>
+      </div>
+    </div>
+
+    <!-- Footer with date -->
+    <div class="mt-4 pt-4 border-t border-slate-700">
+      <p class="text-xs text-gray-500">
+        Adicionado em <%= formatted_date %>
+      </p>
+    </div>
+  <% end %>
+</div>

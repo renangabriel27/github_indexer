@@ -48,7 +48,7 @@
           <!-- Profile Cards Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <% @profiles.each do |profile| %>
-              <%= render ProfileCardComponent.new(profile: profile) %>
+              <%= render Profiles::CardComponent.new(profile: profile) %>
             <% end %>
           </div>
         <% else %>
