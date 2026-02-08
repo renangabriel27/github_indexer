@@ -36,3 +36,16 @@ en:
       deleted: "Profile removed successfully!"
       rescan_started: "Rescan started!"
       rescan_wait: "Please wait a few minutes before rescanning again"
+  errors:
+    not_found:
+      title: "Page Not Found"
+      message: "The page you are looking for does not exist or has been moved. Please check the address and try again."
+      back_to_home: "Back to Home"
+    internal_server_error:
+      title: "Internal Server Error"
+      message: "Something went wrong on the server. Our team has been notified and is working to resolve the issue. Please try again in a few moments."
+      back_to_home: "Back to Home"
+    unprocessable_entity:
+      title: "Unprocessable Request"
+      message: "The change you tried to make was rejected. You may have tried to modify something without permission or the submitted data is invalid."
+      back_to_home: "Back to Home"
