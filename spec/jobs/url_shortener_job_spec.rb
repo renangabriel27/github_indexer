@@ -13,7 +13,7 @@ RSpec.describe UrlShortenerJob, type: :job do
     context 'when profile exists' do
       context 'when service returns success' do
         before do
-          allow(ShortioUrlShortenerService).to receive(:call)
+          allow(UrlShortenerService).to receive(:call)
             .with(expected_github_url)
             .and_return(Dry::Monads::Success(short_url: short_url, original_url: expected_github_url))
         end
@@ -24,16 +24,16 @@ RSpec.describe UrlShortenerJob, type: :job do
           end.to change { profile.reload.short_github_url }.to(short_url)
         end
 
-        it 'calls ShortioUrlShortenerService with the correct GitHub URL' do
+        it 'calls UrlShortenerService with the correct GitHub URL' do
           described_class.new.perform(profile.id)
 
-          expect(ShortioUrlShortenerService).to have_received(:call).with(expected_github_url)
+          expect(UrlShortenerService).to have_received(:call).with(expected_github_url)
         end
       end
 
       context 'when service returns a retryable error' do
         before do
-          allow(ShortioUrlShortenerService).to receive(:call)
+          allow(UrlShortenerService).to receive(:call)
             .and_return(Dry::Monads::Failure(error: :timeout, message: 'Request timeout', retryable: true))
         end
 
@@ -52,7 +52,7 @@ RSpec.describe UrlShortenerJob, type: :job do
 
       context 'when service returns a non-retryable error' do
         before do
-          allow(ShortioUrlShortenerService).to receive(:call)
+          allow(UrlShortenerService).to receive(:call)
             .and_return(Dry::Monads::Failure(error: :authentication_failed, message: 'Invalid API Key', retryable: false))
         end
 
@@ -83,7 +83,7 @@ RSpec.describe UrlShortenerJob, type: :job do
       end
 
       it 'does not call the service' do
-        expect(ShortioUrlShortenerService).not_to receive(:call)
+        expect(UrlShortenerService).not_to receive(:call)
         described_class.new.perform(999_999)
       end
     end

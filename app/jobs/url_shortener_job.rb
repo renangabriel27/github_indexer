@@ -6,11 +6,11 @@ class UrlShortenerJob < ApplicationJob
   sidekiq_options retry: 3
 
   sidekiq_retry_in do |count, exception|
-    case exception
-    when ShortioUrlShortenerService::RateLimitExceededError
-      60 + rand(30)  # 60-90 seconds
-    when Net::OpenTimeout, Net::ReadTimeout
-      [ 30, 120, 300 ][count - 1] || 300
+    case exception.message
+    when /rate.limit/i
+      60 + rand(30)  # 60-90 seconds for rate limit errors
+    when /timeout/i
+      [ 30, 120, 300 ][count - 1] || 300  # Exponential backoff for timeouts
     else
       :kill  # Don't retry for other errors
     end
@@ -29,7 +29,7 @@ class UrlShortenerJob < ApplicationJob
     Rails.logger.info("UrlShortenerJob: Starting for profile_id=#{profile_id}")
 
     github_url = "#{GITHUB_URL}/#{profile.github_username}"
-    result = ShortioUrlShortenerService.call(github_url)
+    result = UrlShortenerService.call(github_url)
 
     if result.success?
       short_url = result.value![:short_url]
