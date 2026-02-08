@@ -2,7 +2,7 @@
 
 class UrlShortenerService < ApplicationService
   ADAPTER_MAP = {
-    'shortio' => UrlShortener::ShortioAdapter
+    "shortio" => UrlShortener::ShortioAdapter
     # Add new adapters here:
     # 'bitly'   => UrlShortener::BitlyAdapter,
     # 'tinyurl' => UrlShortener::TinyUrlAdapter
@@ -22,6 +22,6 @@ class UrlShortenerService < ApplicationService
   private
 
   def provider_name
-    ENV.fetch('URL_SHORTENER_PROVIDER', 'shortio')
+    ENV.fetch("URL_SHORTENER_PROVIDER", "shortio")
   end
 end
