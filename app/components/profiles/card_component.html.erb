@@ -5,7 +5,8 @@
     <%= link_to profile_path(profile),
         class: action_button_classes,
         onclick: "event.stopPropagation();",
-        title: "Visualizar perfil" do %>
+        title: "Visualizar perfil",
+        data: { turbo_frame: "_top" } do %>
       <%= render Ui::IconComponent.new(name: :eye, size: :sm) %>
     <% end %>
 
@@ -13,12 +14,13 @@
     <%= link_to edit_profile_path(profile),
         class: action_button_classes,
         onclick: "event.stopPropagation();",
-        title: "Editar perfil" do %>
+        title: "Editar perfil",
+        data: { turbo_frame: "_top" } do %>
       <%= render Ui::IconComponent.new(name: :edit, size: :sm) %>
     <% end %>
   </div>
 
-  <%= link_to profile_path(profile), class: "block" do %>
+  <%= link_to profile_path(profile), class: "block", data: { turbo_frame: "_top" } do %>
     <div class="flex items-center gap-4 mb-4">
       <%= image_tag avatar_url,
           class: "h-16 w-16 rounded-full ring-2 ring-slate-600 group-hover:ring-indigo-500 transition-all",
