@@ -24,7 +24,7 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
   # Disable variant processing since we don't use image uploads (only external GitHub avatars)
-  config.active_storage.variant_processor = :vips
+  config.active_storage.variant_processor = :disabled
   config.active_storage.draw_routes = false
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
