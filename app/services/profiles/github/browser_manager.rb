@@ -39,7 +39,7 @@ module Profiles
       private
 
       def setup_browser
-        browser_path = ENV.fetch('CHROME_BIN', '/usr/bin/chromium')
+        browser_path = ENV.fetch("CHROME_BIN", "/usr/bin/chromium")
 
         Ferrum::Browser.new(
           headless: true,
