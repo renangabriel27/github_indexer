@@ -82,7 +82,7 @@ module Profiles
         return 0 if opened_at.zero?
 
         remaining = TIMEOUT - (Time.current.to_i - opened_at)
-        [remaining, 0].max
+        [ remaining, 0 ].max
       end
 
       def increment_failures
