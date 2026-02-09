@@ -38,9 +38,6 @@ Uma ferramenta para indexação e busca de perfis do GitHub.
 ### Progresso de Scraping
 ![Progresso de Scraping](public/screenshots/profile-progress.png)
 
-### Documentação da API (Swagger)
-![Documentação da API](public/screenshots/api-docs.png)
-
 ## ✨ Funcionalidades
 
 - **Gerenciamento de Perfis**: Cadastre, indexe, busque e gerencie perfis do GitHub
@@ -129,6 +126,8 @@ SIDEKIQ_PASSWORD=change_me_in_production
 ```
 
 ## 📚 Documentação da API
+
+![Documentação da API](public/screenshots/api-docs.png)
 
 Documentação interativa da API disponível em `/api-docs` (Swagger UI).
 
