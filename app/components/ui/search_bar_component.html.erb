@@ -11,6 +11,10 @@
           placeholder: placeholder,
           class: input_classes,
           data: { action: "search-debounce#search" },
+          autocomplete: "off",
+          autocorrect: "off",
+          autocapitalize: "off",
+          spellcheck: "false",
           "aria-label": "Search" %>
 
       <button type="submit" class="<%= button_classes %>" aria-label="Submit search">

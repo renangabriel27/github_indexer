@@ -29,7 +29,7 @@ module Ui
     end
 
     def input_classes
-      "w-full bg-transparent border-0 pl-11 sm:pl-14 pr-16 sm:pr-24 py-4 sm:py-5 text-white placeholder-gray-500 text-base sm:text-lg focus:ring-0 focus:outline-none"
+      "w-full bg-transparent border-0 pl-11 sm:pl-14 pr-16 sm:pr-24 py-4 sm:py-5 text-white placeholder-gray-500 text-[16px] sm:text-lg focus:ring-0 focus:outline-none"
     end
 
     def button_classes
