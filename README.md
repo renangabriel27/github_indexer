@@ -110,6 +110,8 @@ SHORTIO_API_KEY=your_api_key_here
 SHORTIO_DOMAIN=go.short.io
 RAILS_ENV=development
 SECRET_KEY_BASE=generate_with_rails_secret
+SIDEKIQ_USERNAME=admin
+SIDEKIQ_PASSWORD=change_me_in_production
 ```
 
 ## 📚 Documentação da API
