@@ -38,9 +38,6 @@ Uma ferramenta para indexação e busca de perfis do GitHub.
 ### Progresso de Scraping
 ![Progresso de Scraping](public/screenshots/profile-progress.png)
 
-### Versão Mobile
-![Versão Mobile](public/screenshots/profile-mobile.jpeg)
-
 ### Documentação da API (Swagger)
 ![Documentação da API](public/screenshots/api-docs.png)
 
