@@ -21,6 +21,23 @@ class RescanProfileJob < ApplicationJob
     end
   end
 
+  # Called when job fails after all retries are exhausted
+  sidekiq_retries_exhausted do |job, _exception|
+    profile_id = job["args"].first
+    profile = Profile.find_by(id: profile_id)
+
+    if profile
+      profile.update(
+        scraping_status: :failed,
+        last_error: "Job failed after all retries",
+        last_scanned_at: Time.current
+      )
+
+      # Broadcast failure to close the modal
+      Profiles::Github::Broadcaster.new(profile).broadcast_error("Erro ao processar perfil após múltiplas tentativas")
+    end
+  end
+
   def perform(profile_id)
     profile = find_record_safely(Profile, profile_id)
     return unless profile

@@ -18,18 +18,37 @@ export default class extends Controller {
       this.safetyCheckTimer = setTimeout(() => {
         this.checkStatusOnce()
       }, 3000)
+
+      // Maximum timeout: close modal after 2 minutes regardless of status
+      this.maxTimeoutTimer = setTimeout(() => {
+        this.handleTimeout()
+      }, 120000) // 2 minutes
     }
   }
 
   disconnect() {
+    this.clearAllTimers()
     if (this.subscription) {
       this.subscription.unsubscribe()
     }
+  }
+
+  clearAllTimers() {
     if (this.fallbackTimer) {
       clearTimeout(this.fallbackTimer)
+      this.fallbackTimer = null
     }
     if (this.safetyCheckTimer) {
       clearTimeout(this.safetyCheckTimer)
+      this.safetyCheckTimer = null
+    }
+    if (this.maxTimeoutTimer) {
+      clearTimeout(this.maxTimeoutTimer)
+      this.maxTimeoutTimer = null
+    }
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval)
+      this.pollingInterval = null
     }
   }
 
@@ -106,14 +125,7 @@ export default class extends Controller {
 
   handleUpdate(data) {
     // Cancel timers since we're receiving updates
-    if (this.fallbackTimer) {
-      clearTimeout(this.fallbackTimer)
-      this.fallbackTimer = null
-    }
-    if (this.safetyCheckTimer) {
-      clearTimeout(this.safetyCheckTimer)
-      this.safetyCheckTimer = null
-    }
+    this.clearAllTimers()
 
     switch (data.action) {
       case "update_status":
@@ -163,6 +175,7 @@ export default class extends Controller {
   }
 
   handleCompletion(data) {
+    this.clearAllTimers()
     this.updateMessage(data.message)
 
     // Show success state briefly, then close modal and reload
@@ -180,6 +193,7 @@ export default class extends Controller {
   }
 
   handleError(data) {
+    this.clearAllTimers()
     this.updateMessage(data.message)
 
     // Show close button on error
@@ -191,6 +205,24 @@ export default class extends Controller {
     this.showErrorFlash(data.error || data.message)
 
     // Auto-close modal after 5 seconds on error
+    setTimeout(() => {
+      this.closeModal()
+    }, 5000)
+  }
+
+  handleTimeout() {
+    this.clearAllTimers()
+    this.updateMessage("Tempo limite excedido. Tente novamente.")
+
+    // Show close button
+    if (this.hasCloseButtonTarget) {
+      this.closeButtonTarget.classList.remove('hidden')
+    }
+
+    // Show error flash
+    this.showErrorFlash("O processamento está demorando mais do que o esperado. Verifique o status mais tarde.")
+
+    // Auto-close modal after 5 seconds
     setTimeout(() => {
       this.closeModal()
     }, 5000)
