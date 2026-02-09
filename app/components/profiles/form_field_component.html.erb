@@ -3,8 +3,8 @@
 
   <div class="<%= input_container_classes %>">
     <% if prefix.present? %>
-      <!-- Prefix (read-only text like "github.com/") -->
-      <div class="<%= prefix_container_classes %>">
+      <!-- Prefix (read-only text like "github.com/") - Hidden on mobile -->
+      <div class="<%= prefix_container_classes %> hidden sm:flex">
         <span class="<%= prefix_inner_classes %>">
           <% if icon.present? %>
             <%= render Ui::IconComponent.new(name: icon, size: :md) %>

@@ -54,7 +54,7 @@ module Profiles
     def input_classes
       base = "w-full bg-slate-900/50 border rounded-xl text-white placeholder-gray-500 transition-all focus:outline-none focus:ring-2"
       padding = if prefix.present?
-        "pl-44 pr-4 py-3.5"  # Fixed padding for github.com/ prefix
+        "px-4 sm:pl-44 sm:pr-4 py-3.5"  # Responsive padding: normal on mobile, prefix spacing on desktop
       elsif icon.present?
         "pl-12 pr-4 py-3.5"
       else
