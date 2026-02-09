@@ -444,6 +444,7 @@ bundle exec rspec spec/services/profiles/github/scraper_service_spec.rb -f d
 
 ## 🚀 Pontos de Melhoria
 
+
 ### Scraping
 - **API do GitHub**: Migrar para API oficial do GitHub para dados mais confiáveis (requer autenticação para 5000 req/h)
 - **Fallback Strategy**: Implementar fallback automático API → Scraping em caso de falha
@@ -466,11 +467,23 @@ bundle exec rspec spec/services/profiles/github/scraper_service_spec.rb -f d
 - **Auto-scaling**: Configurar auto-scaling baseado em CPU/memória
 - **Infrastructure as Code**: Gerenciar infraestrutura com Terraform
 
-### Performance
-- **Database**: Implementar read replicas do PostgreSQL para distribuir carga
-- **Cache Distribuído**: Migrar para Redis Cluster para escalabilidade
-- **CDN**: Servir assets estáticos via CDN
-- **Full-text Search**: Implementar Meilisearch para buscas mais rápidas e complexas (menor consumo de memória e mais rápido que Elasticsearch)
+### Performance e Escalabilidade
+
+**Capacidade atual**: ~100 scrapes/h, ~10k perfis
+
+**Gargalos**: Ferrum (~100MB/instância), ILIKE (degrada >50k perfis), Redis single-instance
+
+**Database**:
+- Read replicas para queries de leitura
+- Connection pooling com PgBouncer
+- Índices otimizados para busca
+
+**Cache e Jobs**:
+- Redis Cluster para cache distribuído
+- Múltiplos workers Sidekiq com filas separadas (`scraping`, `notifications`, `api`)
+
+**Busca**:
+- Migrar para Meilisearch quando >50k perfis (10-20x mais rápido que ILIKE)
 
 ### Features
 - **Webhooks do GitHub**: Receber notificações automáticas de mudanças em perfis
