@@ -2,38 +2,38 @@
   <div class="flex flex-col items-center gap-4">
     <!-- Pagination Controls - sempre mostra quando há mais de 1 página -->
     <% if pagy.pages > 1 %>
-      <div class="flex items-center justify-center gap-6">
+      <div class="flex items-center justify-center gap-2 sm:gap-6 w-full px-4 overflow-x-auto">
         <!-- Previous Button -->
         <% if pagy_prev_page(pagy) %>
           <%= link_to profiles_path(request.query_parameters.merge(page: pagy_prev_page(pagy))),
-              class: "group relative inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20 mr-2",
+              class: "group relative inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20 text-sm sm:text-base flex-shrink-0",
               data: { turbo_frame: "profiles" } do %>
             <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Anterior</span>
+            <span class="hidden sm:inline">Anterior</span>
           <% end %>
         <% else %>
-          <span class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 border border-slate-800 rounded-xl text-gray-500 cursor-not-allowed mr-2">
+          <span class="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-slate-900/50 border border-slate-800 rounded-xl text-gray-500 cursor-not-allowed text-sm sm:text-base flex-shrink-0">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Anterior</span>
+            <span class="hidden sm:inline">Anterior</span>
           </span>
         <% end %>
 
         <!-- Page Numbers -->
-        <div class="flex items-center gap-4 mx-2">
+        <div class="flex items-center gap-2 sm:gap-4 mx-1 sm:mx-2">
           <% pagy_series(pagy).each do |item| %>
             <% if item == "..." %>
-              <span class="px-3 py-2.5 text-gray-500 text-sm">…</span>
+              <span class="px-2 sm:px-3 py-2 sm:py-2.5 text-gray-500 text-xs sm:text-sm">…</span>
             <% elsif item == pagy.page %>
-              <span class="relative px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white font-semibold text-sm shadow-lg shadow-indigo-500/50">
+              <span class="relative px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white font-semibold text-xs sm:text-sm shadow-lg shadow-indigo-500/50 flex-shrink-0">
                 <%= item %>
               </span>
             <% else %>
               <%= link_to item, profiles_path(request.query_parameters.merge(page: item)),
-                  class: "px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium text-sm transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20",
+                  class: "px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium text-xs sm:text-sm transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20 flex-shrink-0",
                   data: { turbo_frame: "profiles" } %>
             <% end %>
           <% end %>
@@ -42,16 +42,16 @@
         <!-- Next Button -->
         <% if pagy_next_page(pagy) %>
           <%= link_to profiles_path(request.query_parameters.merge(page: pagy_next_page(pagy))),
-              class: "group relative inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20 ml-2",
+              class: "group relative inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20 text-sm sm:text-base flex-shrink-0",
               data: { turbo_frame: "profiles" } do %>
-            <span>Próxima</span>
+            <span class="hidden sm:inline">Próxima</span>
             <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           <% end %>
         <% else %>
-          <span class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900/50 border border-slate-800 rounded-xl text-gray-500 cursor-not-allowed ml-2">
-            <span>Próxima</span>
+          <span class="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-slate-900/50 border border-slate-800 rounded-xl text-gray-500 cursor-not-allowed text-sm sm:text-base flex-shrink-0">
+            <span class="hidden sm:inline">Próxima</span>
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>

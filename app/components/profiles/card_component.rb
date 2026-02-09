@@ -13,7 +13,7 @@ module Profiles
     end
 
     def action_container_classes
-      "absolute top-4 right-4 z-10 flex items-center gap-2 opacity-0 md:group-hover:opacity-100 md:[@media(hover:none)]:opacity-100 transition-opacity duration-200"
+      "absolute top-4 right-4 z-10 flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
     end
 
     def action_button_classes
@@ -29,7 +29,7 @@ module Profiles
     end
 
     def name_container_classes
-      "flex-1 min-w-0 pr-32 md:pr-0 md:group-hover:pr-32"
+      "flex-1 min-w-0 pr-28 md:pr-0 md:group-hover:pr-32"
     end
 
     def stat_classes

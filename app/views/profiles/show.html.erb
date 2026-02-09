@@ -10,9 +10,9 @@
 
     <!-- Processing Banner -->
     <div id="processing-banner"
-         class="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl flex items-center gap-3 <%= 'hidden' unless @profile.scraping_status == 'processing' %>"
+         class="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl <%= 'hidden' unless @profile.scraping_status == 'processing' %>"
          data-profile-status-polling-target="processingBanner">
-      <div class="flex items-center gap-3 flex-1">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-1">
         <%= render Ui::IconComponent.new(name: :spinner, size: :md, css_class: "text-blue-400 flex-shrink-0 animate-spin") %>
         <div class="flex-1">
           <p class="text-blue-400 font-medium">Atualizando perfil...</p>
@@ -79,9 +79,9 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="p-8 bg-slate-900/50 flex flex-wrap gap-3">
+      <div class="p-6 sm:p-8 bg-slate-900/50 flex flex-col sm:flex-row sm:flex-wrap gap-3">
         <%= button_to rescan_profile_path(@profile),
-            class: "inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white font-semibold hover:shadow-lg hover:shadow-indigo-500/50 transition-all duration-200 hover:scale-105" do %>
+            class: "inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white font-semibold hover:shadow-lg hover:shadow-indigo-500/50 transition-all duration-200 hover:scale-105" do %>
           <%= render Ui::IconComponent.new(name: :refresh, size: :md) %>
           Re-escanear
         <% end %>
@@ -90,7 +90,8 @@
           text: "Editar",
           variant: :secondary,
           icon: :edit,
-          href: edit_profile_path(@profile)
+          href: edit_profile_path(@profile),
+          class: "w-full sm:w-auto justify-center"
         ) %>
 
         <%= render Shared::ModalComponent.new(
@@ -102,7 +103,7 @@
         ) do |modal| %>
           <% modal.with_trigger do %>
             <button type="button"
-                    class="inline-flex items-center gap-2 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl text-red-400 font-medium transition-all duration-200"
+                    class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl text-red-400 font-medium transition-all duration-200 w-full sm:w-auto"
                     aria-label="Delete profile">
               <%= render Ui::IconComponent.new(name: :trash, size: :md) %>
               Remover
