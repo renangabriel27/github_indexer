@@ -158,5 +158,65 @@ RSpec.describe RescanProfileJob, type: :job do
       delay = job.sidekiq_retry_in_block.call(1, StandardError.new("generic error"))
       expect(delay).to eq(10)
     end
+
+    it 'returns :kill for unknown exception types' do
+      unknown_error = Class.new(Exception).new("unknown error")
+      delay = job.sidekiq_retry_in_block.call(1, unknown_error)
+      expect(delay).to eq(:kill)
+    end
+  end
+
+  describe 'sidekiq_retries_exhausted' do
+    let(:profile) { create(:profile, github_username: 'testuser') }
+    let(:exception) { StandardError.new("Browser timeout") }
+    let(:job_hash) { { "args" => [profile.id] } }
+    let(:broadcaster) { instance_double(Profiles::Github::Broadcaster) }
+
+    before do
+      allow(Profiles::Github::Broadcaster).to receive(:new).with(profile).and_return(broadcaster)
+      allow(broadcaster).to receive(:broadcast_error)
+    end
+
+    it 'updates profile status to failed' do
+      described_class.sidekiq_retries_exhausted_block.call(job_hash, exception)
+
+      expect(profile.reload.scraping_status).to eq('failed')
+    end
+
+    it 'sets last_error message' do
+      described_class.sidekiq_retries_exhausted_block.call(job_hash, exception)
+
+      expect(profile.reload.last_error).to eq('Job failed after all retries')
+    end
+
+    it 'updates last_scanned_at timestamp' do
+      expect do
+        described_class.sidekiq_retries_exhausted_block.call(job_hash, exception)
+      end.to change { profile.reload.last_scanned_at }
+
+      expect(profile.last_scanned_at).to be_within(1.second).of(Time.current)
+    end
+
+    it 'broadcasts error message' do
+      described_class.sidekiq_retries_exhausted_block.call(job_hash, exception)
+
+      expect(broadcaster).to have_received(:broadcast_error).with('Erro ao processar perfil após múltiplas tentativas')
+    end
+
+    context 'when profile does not exist' do
+      let(:job_hash) { { "args" => [999_999] } }
+
+      it 'does not raise error' do
+        expect do
+          described_class.sidekiq_retries_exhausted_block.call(job_hash, exception)
+        end.not_to raise_error
+      end
+
+      it 'does not attempt to broadcast' do
+        described_class.sidekiq_retries_exhausted_block.call(job_hash, exception)
+
+        expect(Profiles::Github::Broadcaster).not_to have_received(:new)
+      end
+    end
   end
 end

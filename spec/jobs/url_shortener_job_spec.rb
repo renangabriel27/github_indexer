@@ -88,4 +88,55 @@ RSpec.describe UrlShortenerJob, type: :job do
       end
     end
   end
+
+  describe 'retry strategy' do
+    let(:job) { described_class.new }
+
+    context 'when exception is rate limit error' do
+      let(:rate_limit_error) { StandardError.new('rate limit exceeded') }
+
+      it 'returns retry delay between 60-90 seconds on first retry' do
+        delay = job.sidekiq_retry_in_block.call(1, rate_limit_error)
+        expect(delay).to be_between(60, 90)
+      end
+
+      it 'returns retry delay between 60-90 seconds on subsequent retries' do
+        delay = job.sidekiq_retry_in_block.call(2, rate_limit_error)
+        expect(delay).to be_between(60, 90)
+      end
+    end
+
+    context 'when exception is timeout error' do
+      let(:timeout_error) { StandardError.new('timeout occurred') }
+
+      it 'returns 30 seconds on first retry' do
+        delay = job.sidekiq_retry_in_block.call(1, timeout_error)
+        expect(delay).to eq(30)
+      end
+
+      it 'returns 120 seconds on second retry' do
+        delay = job.sidekiq_retry_in_block.call(2, timeout_error)
+        expect(delay).to eq(120)
+      end
+
+      it 'returns 300 seconds on third retry' do
+        delay = job.sidekiq_retry_in_block.call(3, timeout_error)
+        expect(delay).to eq(300)
+      end
+
+      it 'returns 300 seconds on retries beyond third' do
+        delay = job.sidekiq_retry_in_block.call(4, timeout_error)
+        expect(delay).to eq(300)
+      end
+    end
+
+    context 'when exception is other error type' do
+      let(:other_error) { StandardError.new('some other error') }
+
+      it 'returns :kill to prevent retry' do
+        delay = job.sidekiq_retry_in_block.call(1, other_error)
+        expect(delay).to eq(:kill)
+      end
+    end
+  end
 end
