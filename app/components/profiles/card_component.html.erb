@@ -1,6 +1,6 @@
 <div class="<%= card_classes %>">
   <!-- Action Icons - Top Right Corner -->
-  <div class="absolute top-4 right-4 z-10 flex items-center gap-2">
+  <div class="<%= action_container_classes %>">
     <!-- View Icon -->
     <%= link_to profile_path(profile),
         class: action_button_classes,
@@ -18,6 +18,33 @@
         data: { turbo_frame: "_top" } do %>
       <%= render Ui::IconComponent.new(name: :edit, size: :sm) %>
     <% end %>
+
+    <!-- Delete Icon with Modal -->
+    <%= render Shared::ModalComponent.new(
+      title: "Confirmar Exclusão",
+      description: "Esta ação não pode ser desfeita",
+      confirm_text: "Remover",
+      confirm_url: profile_path(profile),
+      confirm_method: :delete
+    ) do |modal| %>
+      <% modal.with_trigger do %>
+        <button type="button"
+                class="<%= action_button_classes %> hover:bg-red-500/20 hover:border-red-500/50 hover:text-red-400"
+                data-action="click->modal#open"
+                onclick="event.stopPropagation();"
+                title="Remover perfil"
+                aria-label="Remover perfil">
+          <%= render Ui::IconComponent.new(name: :trash, size: :sm) %>
+        </button>
+      <% end %>
+      <% modal.with_body do %>
+        <p>
+          Tem certeza que deseja remover o perfil de
+          <span class="font-semibold text-white">@<%= profile.github_username %></span>?
+          Todos os dados associados serão perdidos permanentemente.
+        </p>
+      <% end %>
+    <% end %>
   </div>
 
   <%= link_to profile_path(profile), class: "block", data: { turbo_frame: "_top" } do %>
@@ -26,7 +53,7 @@
           class: "h-16 w-16 rounded-full ring-2 ring-slate-600 group-hover:ring-indigo-500 transition-all",
           alt: display_name %>
 
-      <div class="flex-1 min-w-0">
+      <div class="<%= name_container_classes %>">
         <h3 class="<%= username_classes %>">
           <%= display_name %>
         </h3>

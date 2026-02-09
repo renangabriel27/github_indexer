@@ -1,6 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="modal"
 export default class extends Controller {
   static targets = ["backdrop", "container"]
   static values = {
@@ -8,54 +7,131 @@ export default class extends Controller {
   }
 
   connect() {
-    // Trap focus within modal when open
     this.boundHandleTab = this.handleTab.bind(this)
   }
 
+  getBackdrop() {
+    if (this._portaledBackdrop) {
+      return this._portaledBackdrop
+    }
+    return this.element.querySelector('[data-modal-target="backdrop"]')
+  }
+
+  getContainer() {
+    return this.element.querySelector('[data-modal-target="container"]')
+  }
+
+  portalModal() {
+    const backdrop = this.getBackdrop()
+    if (!backdrop || backdrop.hasAttribute('data-portaled')) return
+
+    document.body.appendChild(backdrop)
+    backdrop.setAttribute('data-portaled', 'true')
+
+    this._portaledBackdrop = backdrop
+    this.setupPortaledListeners(backdrop)
+  }
+
+  setupPortaledListeners(backdrop) {
+    const closeButtons = backdrop.querySelectorAll('[data-action*="modal#close"]')
+
+    closeButtons.forEach(button => {
+      if (!button._modalCloseHandler) {
+        button._modalCloseHandler = (e) => this.close(e)
+        button.addEventListener('click', button._modalCloseHandler)
+      }
+    })
+
+    if (!backdrop._modalBackdropHandler) {
+      backdrop._modalBackdropHandler = (e) => this.closeOnBackdrop(e)
+      backdrop.addEventListener('click', backdrop._modalBackdropHandler)
+    }
+
+    if (!this._escKeyHandler) {
+      this._escKeyHandler = (e) => {
+        if (e.key === 'Escape') {
+          const backdrop = this.getBackdrop()
+          if (backdrop && !backdrop.classList.contains('hidden')) {
+            this.close(e)
+          }
+        }
+      }
+      window.addEventListener('keydown', this._escKeyHandler)
+    }
+  }
+
   disconnect() {
-    // Clean up event listeners
+    const backdrop = this.getBackdrop()
+    if (backdrop && backdrop.hasAttribute('data-portaled')) {
+      this.cleanupPortaledListeners(backdrop)
+      backdrop.remove()
+      this._portaledBackdrop = null
+    }
+
     document.removeEventListener('keydown', this.boundHandleTab)
   }
 
-  open(event) {
-    if (event) {
-      event.preventDefault()
+  cleanupPortaledListeners(backdrop) {
+    const closeButtons = backdrop.querySelectorAll('[data-action*="modal#close"]')
+    closeButtons.forEach(button => {
+      if (button._modalCloseHandler) {
+        button.removeEventListener('click', button._modalCloseHandler)
+        delete button._modalCloseHandler
+      }
+    })
+
+    if (backdrop._modalBackdropHandler) {
+      backdrop.removeEventListener('click', backdrop._modalBackdropHandler)
+      delete backdrop._modalBackdropHandler
     }
 
-    this.backdropTarget.classList.remove('hidden')
-    this.backdropTarget.classList.add('flex')
+    if (this._escKeyHandler) {
+      window.removeEventListener('keydown', this._escKeyHandler)
+      delete this._escKeyHandler
+    }
+  }
 
-    // Enable focus trap
+  open(event) {
+    if (event) event.preventDefault()
+
+    const backdrop = this.getBackdrop()
+    if (!backdrop) return
+
+    this.portalModal()
+
+    backdrop.classList.remove('hidden')
+    backdrop.classList.add('flex')
+
     document.addEventListener('keydown', this.boundHandleTab)
-
-    // Focus first focusable element in modal
     this.focusFirstElement()
   }
 
   close(event) {
-    if (event) {
-      event.preventDefault()
-    }
+    if (event) event.preventDefault()
 
-    this.backdropTarget.classList.add('hidden')
-    this.backdropTarget.classList.remove('flex')
+    const backdrop = this.getBackdrop()
+    if (!backdrop) return
 
-    // Disable focus trap
+    backdrop.classList.add('hidden')
+    backdrop.classList.remove('flex')
+
     document.removeEventListener('keydown', this.boundHandleTab)
   }
 
   closeOnBackdrop(event) {
-    // Only close if clicking the backdrop itself, not its children
-    if (event.target === this.backdropTarget) {
+    const backdrop = this.getBackdrop()
+    if (backdrop && event.target === backdrop) {
       this.close(event)
     }
   }
 
   handleTab(event) {
-    // Focus trap: keep focus within modal
     if (event.key !== 'Tab') return
 
-    const focusableElements = this.containerTarget.querySelectorAll(
+    const container = this.getContainer()
+    if (!container) return
+
+    const focusableElements = container.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     )
 
@@ -65,13 +141,11 @@ export default class extends Controller {
     const lastElement = focusableElements[focusableElements.length - 1]
 
     if (event.shiftKey) {
-      // Shift + Tab: going backwards
       if (document.activeElement === firstElement) {
         event.preventDefault()
         lastElement.focus()
       }
     } else {
-      // Tab: going forwards
       if (document.activeElement === lastElement) {
         event.preventDefault()
         firstElement.focus()
@@ -80,12 +154,14 @@ export default class extends Controller {
   }
 
   focusFirstElement() {
-    const focusableElements = this.containerTarget.querySelectorAll(
+    const container = this.getContainer()
+    if (!container) return
+
+    const focusableElements = container.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     )
 
     if (focusableElements.length > 0) {
-      // Focus the cancel button (usually first) rather than confirm button
       const cancelButton = Array.from(focusableElements).find(el =>
         el.textContent.toLowerCase().includes('cancelar') ||
         el.textContent.toLowerCase().includes('cancel')

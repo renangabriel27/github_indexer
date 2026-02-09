@@ -12,6 +12,10 @@ module Profiles
       "group relative bg-slate-800 border border-slate-700 rounded-2xl p-6 hover:bg-slate-750 hover:border-slate-600 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1"
     end
 
+    def action_container_classes
+      "absolute top-4 right-4 z-10 flex items-center gap-2 opacity-0 md:group-hover:opacity-100 md:[@media(hover:none)]:opacity-100 transition-opacity duration-200"
+    end
+
     def action_button_classes
       "p-2 bg-slate-700/80 hover:bg-slate-600 border border-slate-600 rounded-lg text-gray-400 hover:text-white transition-all duration-200 hover:scale-110 hover:shadow-lg"
     end
@@ -22,6 +26,10 @@ module Profiles
 
     def username_classes
       "text-lg font-bold text-white truncate group-hover:text-indigo-400 transition-colors"
+    end
+
+    def name_container_classes
+      "flex-1 min-w-0 pr-32 md:pr-0 md:group-hover:pr-32"
     end
 
     def stat_classes
