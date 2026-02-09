@@ -9,7 +9,23 @@
 
 Uma ferramenta para indexação e busca de perfis do GitHub.
 
-## Funcionalidades
+## 📋 Sumário
+
+- [✨ Funcionalidades](#-funcionalidades)
+- [🛠️ Stack Tecnológica](#️-stack-tecnológica)
+- [📦 Instalação](#-instalação)
+- [⚙️ Configuração](#️-configuração)
+- [📚 Documentação da API](#-documentação-da-api)
+- [🧪 Testes](#-testes)
+- [🏗️ Arquitetura](#️-arquitetura)
+- [💡 Decisões Técnicas](#-decisões-técnicas)
+- [⚠️ Limitações Conhecidas](#️-limitações-conhecidas)
+- [🚀 Pontos de Melhoria](#-pontos-de-melhoria)
+- [🤝 Contribuindo](#-contribuindo)
+- [📄 Licença](#-licença)
+- [👤 Autor](#-autor)
+
+## ✨ Funcionalidades
 
 - **Gerenciamento de Perfis**: Cadastre, indexe, busque e gerencie perfis do GitHub
 - **Web Scraping**: Extração automática usando Chrome headless (Ferrum) com suporte a retry
@@ -19,7 +35,7 @@ Uma ferramenta para indexação e busca de perfis do GitHub.
 - **Rate Limiting**: Proteção contra abuso da API (100 req/min)
 - **Interface Responsiva**: Interface moderna com TailwindCSS e ViewComponents
 
-## Stack Tecnológica
+## 🛠️ Stack Tecnológica
 
 **Backend**: Ruby 4.0.1, Rails 8.1.2, PostgreSQL, Redis, Sidekiq
 
@@ -31,9 +47,9 @@ Uma ferramenta para indexação e busca de perfis do GitHub.
 
 **Qualidade**: RSpec, Capybara, FactoryBot, Rubocop, SimpleCov, Brakeman
 
-## Instalação
+## 📦 Instalação
 
-### Pré-requisitos
+### ⚡ Pré-requisitos
 
 - Ruby 4.0.1 (via rbenv/asdf)
 - PostgreSQL 14+
@@ -41,7 +57,7 @@ Uma ferramenta para indexação e busca de perfis do GitHub.
 - Node.js 18+ (para TailwindCSS)
 - Conta no [Short.io](https://short.io) (chave API gratuita)
 
-### Configuração
+### 🚀 Configuração
 
 ```bash
 # Clone o repositório
@@ -73,7 +89,7 @@ bin/dev
 # Acesse em http://localhost:3000
 ```
 
-### Configuração com Docker
+### 🐳 Configuração com Docker
 
 ```bash
 docker-compose up
@@ -81,7 +97,7 @@ docker-compose exec web rails db:migrate
 # Acesse em http://localhost:3000
 ```
 
-## Configuração
+## ⚙️ Configuração
 
 Crie um arquivo `.env` na raiz do projeto:
 
@@ -94,11 +110,11 @@ RAILS_ENV=development
 SECRET_KEY_BASE=generate_with_rails_secret
 ```
 
-## Documentação da API
+## 📚 Documentação da API
 
 Documentação interativa da API disponível em `/api-docs` (Swagger UI).
 
-### Endpoints
+### 🔌 Endpoints
 
 #### GET /api/v1/profiles
 
@@ -120,13 +136,13 @@ curl -X GET "http://localhost:3000/api/v1/profiles/1" \
   -H "Accept: application/json"
 ```
 
-### Rate Limiting
+### 🛡️ Rate Limiting
 
 - **Limite**: 100 requisições por minuto por IP
 - **Headers**: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
 - **Excedido**: Retorna 429 Too Many Requests
 
-## Testes
+## 🧪 Testes
 
 ```bash
 # Suite completa de testes
@@ -142,7 +158,7 @@ bundle exec rspec spec/requests                # Testes de integração
 bundle exec rspec spec/features                # Testes de feature
 ```
 
-### Ferramentas de Qualidade
+### 🔍 Ferramentas de Qualidade
 
 ```bash
 bundle exec rubocop        # Linting
@@ -150,7 +166,7 @@ bundle exec brakeman       # Análise de segurança
 bundle exec bundle-audit   # Auditoria de dependências
 ```
 
-## Arquitetura
+## 🏗️ Arquitetura
 
 ```
 app/
@@ -183,16 +199,17 @@ app/
 └── validators/              # Validadores customizados
 ```
 
-### Padrões de Projeto
+### 🎯 Padrões de Projeto
 
 - **Service Objects**: Encapsulam lógica de negócio complexa
+- **Organizer Pattern**: Pipeline de execução sequencial de steps com `OrganizedService`, usado em `HtmlParser` para processar dados do scraping em etapas discretas com tratamento de falhas via Dry-Monads
 - **Adapter Pattern**: Abstração de integração com serviços externos (encurtamento de URLs)
 - **Query Objects**: Encapsulam queries complexas do ActiveRecord
 - **Dry-Monads**: Tratamento funcional de erros com `Success` e `Failure`
 - **Concerns**: Funcionalidade compartilhada entre models
 - **ViewComponents**: Componentes frontend testáveis e reutilizáveis
 
-## Decisões Técnicas
+## 💡 Decisões Técnicas
 
 ### Blueprinter para Serialização
 - 40% mais rápido que ActiveModel::Serializer
@@ -212,7 +229,7 @@ app/
 - Chrome headless real para renderização de JavaScript
 - Retry automático e tratamento de timeout
 
-## Limitações Conhecidas
+## ⚠️ Limitações Conhecidas
 
 - **Web Scraping**: Seletores CSS podem quebrar se o GitHub alterar a estrutura HTML
 - **Rate Limits**: GitHub pode bloquear por IP; plano gratuito do Short.io limitado a 1000 URLs/mês
@@ -220,7 +237,7 @@ app/
 - **Dados Opcionais**: Alguns perfis podem não ter organização ou localização
 - **Cooldown de Re-scan**: Intervalo de 5 minutos entre re-scans
 
-## Pontos de Melhoria
+## 🚀 Pontos de Melhoria
 
 ### Scraping
 - **API do GitHub**: Migrar para API oficial do GitHub para dados mais confiáveis (requer autenticação para 5000 req/h)
@@ -236,13 +253,11 @@ app/
 
 ### Observabilidade
 - **APM**: Integrar Application Performance Monitoring (New Relic, Datadog, Skylight)
-- **Logging Estruturado**: Implementar logs estruturados com Lograge + ELK Stack
 - **Métricas**: Dashboard de métricas com Prometheus + Grafana
 - **Error Tracking**: Rastreamento de erros com Sentry ou Honeybadger
 
 ### Infraestrutura
 - **Kubernetes**: Orquestração de containers para alta disponibilidade
-- **Multi-stage Docker**: Otimizar builds Docker para reduzir tamanho da imagem
 - **Auto-scaling**: Configurar auto-scaling baseado em CPU/memória
 - **Infrastructure as Code**: Gerenciar infraestrutura com Terraform
 
@@ -258,7 +273,7 @@ app/
 - **Comparação de Perfis**: Funcionalidade para comparar estatísticas entre perfis
 - **Notificações**: Sistema de notificações para mudanças significativas em perfis monitorados
 
-## Contribuindo
+## 🤝 Contribuindo
 
 1. Faça um fork do projeto
 2. Crie sua branch de feature (`git checkout -b feature/funcionalidade-incrivel`)
@@ -271,10 +286,18 @@ app/
 - Sem offenses do Rubocop (`bundle exec rubocop`)
 - Cobertura >90% mantida
 
-## Licença
+## 📄 Licença
 
 Este projeto está licenciado sob a Licença MIT.
 
-## Autor
+## 👨‍💻 Autor
 
 **Renan Gabriel** - [@renangabriel27](https://github.com/renangabriel27)
+
+----
+
+<div align="center">
+
+Desenvolvido com ☕ e 💻
+
+</div>
