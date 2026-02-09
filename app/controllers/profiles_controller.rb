@@ -49,8 +49,9 @@ class ProfilesController < ApplicationController
 
   def rescan
     if @profile.can_rescan?
+      @profile.update(scraping_status: :processing)
       RescanProfileJob.perform_later(@profile.id)
-      redirect_to @profile, notice: t("profiles.messages.rescan_started")
+      redirect_to @profile
     else
       redirect_to @profile, alert: t("profiles.messages.rescan_wait")
     end
