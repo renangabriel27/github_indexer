@@ -186,6 +186,7 @@ app/
 │   │   │   ├── extractors/  # Extratores de dados (Avatar, Identity, Location, etc.)
 │   │   │   ├── broadcaster.rb
 │   │   │   ├── browser_manager.rb
+│   │   │   ├── circuit_breaker.rb
 │   │   │   ├── error_handler.rb
 │   │   │   ├── html_parser.rb
 │   │   │   ├── page_validator.rb
@@ -336,6 +337,23 @@ Escolhi Blueprinter após avaliar as principais alternativas:
 
 **Trade-off**: Complexidade adicional (Redis, Sidekiq, ActionCable) vs UX superior
 
+### Circuit Breaker para Scraping
+
+**Decisão**: Circuit Breaker com Redis para proteger contra falhas consecutivas do GitHub
+
+**Motivo**:
+- Evita sobrecarga quando GitHub está indisponível ou com problemas
+- Reduz desperdício de recursos (CPU/RAM do Ferrum) em tentativas fadadas ao fracasso
+- Recuperação automática após período de timeout (60s)
+- Simples e sem dependências extras (usa Redis já existente via Sidekiq)
+
+**Configuração**:
+- **Fechado** (closed): Permite scraping normalmente
+- **Aberto** (open): Após 5 falhas consecutivas, bloqueia tentativas por 60s
+- **Semi-Aberto** (half-open): Após timeout, permite 1 tentativa para testar recuperação
+
+**Trade-off**: Possibilidade de rejeitar requests legítimos durante problemas intermitentes vs proteção contra cascata de falhas
+
 ### URL Shortener Externo (Short.io)
 
 **Decisão**: Short.io via Adapter Pattern
@@ -446,6 +464,7 @@ bundle exec rspec spec/services/profiles/github/scraper_service_spec.rb -f d
 
 
 ### Scraping
+- **Circuit Breaker** ✅: Implementado para proteger contra falhas consecutivas do GitHub (fecha após 5 falhas, tenta novamente após 60s)
 - **API do GitHub**: Migrar para API oficial do GitHub para dados mais confiáveis (requer autenticação para 5000 req/h)
 - **Fallback Strategy**: Implementar fallback automático API → Scraping em caso de falha
 - **Health Monitoring**: Sistema de alertas quando seletores CSS falharem

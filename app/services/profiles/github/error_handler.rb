@@ -18,6 +18,11 @@ module Profiles
         Dry::Monads::Failure(error: :scraping_failed, message: message)
       end
 
+      def handle_circuit_open_error(error)
+        update_profile(:failed, "Circuit breaker aberto: GitHub temporariamente indisponível")
+        Dry::Monads::Failure(error: :circuit_open, message: error.message)
+      end
+
       private
 
       def update_profile(status, error_message)

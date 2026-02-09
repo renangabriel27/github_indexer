@@ -8,17 +8,29 @@ module Profiles
         @github_url = "https://www.github.com/#{profile.github_username}"
         @update_name = update_name
         @error_handler = ErrorHandler.new(profile)
+        @circuit_breaker = CircuitBreaker.new
       end
 
       def call
         @broadcaster = Broadcaster.new(@profile)
         @profile.update(scraping_status: :processing)
         @broadcaster.broadcast_status(:preparing)
-        Success(perform_scraping)
+
+        result = @circuit_breaker.call do
+          Success(perform_scraping)
+        end
+
+        @circuit_breaker.record_success
+        result
+      rescue CircuitOpenError => e
+        @broadcaster.broadcast_error(e.message) if @broadcaster
+        @error_handler.handle_circuit_open_error(e)
       rescue Profiles::ProfileNotFoundError => e
+        @circuit_breaker.record_failure
         @broadcaster.broadcast_error(e.message) if @broadcaster
         @error_handler.handle_not_found_error(e)
       rescue StandardError => e
+        @circuit_breaker.record_failure
         @broadcaster.broadcast_error(e.message) if @broadcaster
         @error_handler.handle_standard_error(e)
       end
