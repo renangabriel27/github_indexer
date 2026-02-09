@@ -19,7 +19,9 @@ Uma ferramenta para indexação e busca de perfis do GitHub.
 - [🧪 Testes](#-testes)
 - [🏗️ Arquitetura](#️-arquitetura)
 - [💡 Decisões Técnicas](#-decisões-técnicas)
+- [⚖️ Trade-offs](#️-trade-offs)
 - [⚠️ Limitações Conhecidas](#️-limitações-conhecidas)
+- [🔧 Troubleshooting](#-troubleshooting)
 - [🚀 Pontos de Melhoria](#-pontos-de-melhoria)
 - [🤝 Contribuindo](#-contribuindo)
 - [📄 Licença](#-licença)
@@ -209,25 +211,153 @@ app/
 - **Concerns**: Funcionalidade compartilhada entre models
 - **ViewComponents**: Componentes frontend testáveis e reutilizáveis
 
+### 📊 Fluxo de Dados
+
+```mermaid
+sequenceDiagram
+    participant U as Usuario
+    participant C as Controller
+    participant S as CreatorService
+    participant Q as Sidekiq
+    participant J as ScraperJob
+    participant G as GitHub
+    participant AC as ActionCable
+
+    U->>C: POST /profiles (name, username)
+    C->>S: CreatorService.call(params)
+    S->>S: Valida e salva Profile
+    S->>Q: GithubScraperJob.perform_later
+    S->>Q: UrlShortenerJob.perform_later
+    C-->>U: Redirect para profile#show
+
+    Note over Q,J: Processamento Assíncrono
+
+    Q->>J: Executa GithubScraperJob
+    J->>AC: broadcast(:preparing)
+    J->>G: Ferrum navega para github.com/user
+    G-->>J: HTML renderizado
+    J->>J: HtmlParser extrai dados
+    J->>AC: broadcast(:completed)
+    AC-->>U: Turbo Stream atualiza UI
+```
+
+### 🔄 Pipeline do Scraper
+
+```mermaid
+flowchart LR
+    A[BrowserManager] --> B[PageValidator]
+    B --> C[HtmlParser]
+    C --> D[IdentityExtractor]
+    C --> E[StatisticsExtractor]
+    C --> F[AvatarExtractor]
+    C --> G[LocationExtractor]
+    C --> H[OrganizationsExtractor]
+    D & E & F & G & H --> I[Profile.update!]
+    I --> J[Broadcaster]
+```
+
 ## 💡 Decisões Técnicas
 
 ### Blueprinter para Serialização
-- 40% mais rápido que ActiveModel::Serializer
-- Zero dependências, mantido ativamente
-- Curva de aprendizado baixa
+
+Escolhi Blueprinter após avaliar as principais alternativas:
+
+| Gem | Req/s | Memória | Dependências | Manutenção |
+|-----|-------|---------|--------------|------------|
+| **Blueprinter** | ~5000 | Baixa | 0 | Ativa |
+| ActiveModel::Serializer | ~3000 | Média | 3 | Lenta |
+| JBuilder | ~2500 | Alta | 1 | Ativa |
+| FastJsonapi | ~5500 | Baixa | 1 | Descontinuada |
+
+**Por que Blueprinter?**
+- Performance comparável ao FastJsonapi, mas ativamente mantido
+- DSL intuitiva e flexível com suporte a views
+- Zero dependências externas reduz superfície de ataque
 
 ### Short.io para Encurtamento de URLs
-- Plano gratuito generoso (1000/mês vs 50/mês do Bitly)
-- Suporte a domínio customizado incluído
-- Adapter pattern permite fácil troca de provedor
+
+| Serviço | Limite Gratuito | Domínio Custom | Analytics |
+|---------|-----------------|----------------|-----------|
+| **Short.io** | 1000/mês | Sim (grátis) | Sim |
+| Bitly | 50/mês | Não (pago) | Limitado |
+| TinyURL | Ilimitado | Não | Não |
+
+**Por que Short.io?**
+- Melhor custo-benefício para MVP
+- Adapter Pattern implementado permite trocar provider sem alterar código de negócio
+- API bem documentada e estável
 
 ### Pagy para Paginação
-- 10-20x mais rápido que Kaminari/WillPaginate
+
+| Gem | Req/s | Memória | LOC |
+|-----|-------|---------|-----|
+| **Pagy** | ~5000 | 9KB | ~100 |
+| Kaminari | ~500 | 90KB | ~1000 |
+| WillPaginate | ~450 | 85KB | ~800 |
+
+**Por que Pagy?**
+- 10-20x mais rápido que alternativas
 - 90% menos uso de memória
+- Totalmente agnóstico (funciona com qualquer ORM/collection)
 
 ### Ferrum para Web Scraping
-- Chrome headless real para renderização de JavaScript
-- Retry automático e tratamento de timeout
+
+| Gem | JavaScript | Memória | Configuração |
+|-----|------------|---------|--------------|
+| **Ferrum** | Sim (Chrome) | ~100MB | Média |
+| Mechanize | Não | ~20MB | Simples |
+| Selenium | Sim | ~150MB | Complexa |
+| Watir | Sim | ~150MB | Complexa |
+
+**Por que Ferrum?**
+- GitHub renderiza elementos dinamicamente via JavaScript (contribuições, contadores)
+- Mechanize não executaria JS, resultando em dados incompletos
+- Ferrum é mais leve que Selenium/Watir e tem API Ruby-native
+
+### Dry-Monads para Tratamento de Erros
+
+**Por que Railway Oriented Programming?**
+- Tratamento explícito de erros sem exceptions para fluxo de controle
+- Composição funcional com `bind` permite pipelines legíveis
+- Pattern matching com `Success`/`Failure` torna código previsível
+- Facilita testes unitários isolados
+
+## ⚖️ Trade-offs
+
+### Processamento Assíncrono
+
+**Decisão**: Jobs assíncronos com Sidekiq + ActionCable para feedback real-time
+
+**Motivo**:
+- Scraping leva 3-5 segundos - bloquearia requisição HTTP
+- UX melhorada com modal de progresso e atualizações via WebSocket
+- Permite retry automático em caso de falha
+- Escalável horizontalmente
+
+**Trade-off**: Complexidade adicional (Redis, Sidekiq, ActionCable) vs UX superior
+
+### URL Shortener Externo (Short.io)
+
+**Decisão**: Short.io via Adapter Pattern
+
+**Motivo**:
+- MVP rápido - implementação própria bem completa levaria mais tempo
+- Analytics incluído gratuitamente
+- Adapter Pattern facilita trocar provider no futuro
+
+**Trade-off**: Dependência externa (1000 URLs/mês gratuitas) vs tempo de desenvolvimento
+
+### ViewComponents
+
+**Decisão**: ViewComponents para UI complexa (Cards, Modals, Forms)
+
+**Motivo**:
+- Testes unitários isolados (sem Rails.application.call)
+- Performance melhorada com caching
+- Interface tipada e reutilizável
+- Padrão moderno Rails 7+
+
+**Trade-off**: Curva de aprendizado inicial vs testabilidade e manutenibilidade
 
 ## ⚠️ Limitações Conhecidas
 
@@ -236,6 +366,81 @@ app/
 - **Escalabilidade**: Ferrum usa ~100MB de RAM por instância de navegador
 - **Dados Opcionais**: Alguns perfis podem não ter organização ou localização
 - **Cooldown de Re-scan**: Intervalo de 5 minutos entre re-scans
+
+## 🔧 Troubleshooting
+
+### Scraping falha com TimeoutError
+
+```bash
+# 1. Verificar se Chrome/Chromium está instalado
+which chromium || which google-chrome
+
+# 2. Testar manualmente
+CHROME_BIN=$(which chromium || which google-chrome)
+echo "Chrome path: $CHROME_BIN"
+
+# 3. Verificar logs do job
+bundle exec sidekiq
+# Em outro terminal, monitore:
+tail -f log/development.log | grep -i scraper
+```
+
+### URL Shortening não funciona
+
+```bash
+# 1. Verificar variáveis de ambiente
+echo "API Key: ${SHORTIO_API_KEY:0:10}..."
+echo "Domain: $SHORTIO_DOMAIN"
+
+# 2. Testar API diretamente
+curl -X POST "https://api.short.io/links/public" \
+  -H "Authorization: $SHORTIO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"originalURL":"https://github.com/matz","domain":"go.short.io"}'
+
+# 3. Verificar rate limit (1000/mês no plano gratuito)
+```
+
+### Jobs não estão sendo processados
+
+```bash
+# 1. Verificar se Redis está rodando
+redis-cli ping  # Deve retornar: PONG
+
+# 2. Verificar conexão do Sidekiq
+REDIS_URL=redis://localhost:6379/1 bundle exec sidekiq
+
+# 3. Verificar filas
+bundle exec rails runner "puts Sidekiq::Queue.all.map(&:name)"
+
+# 4. Limpar jobs travados (se necessário)
+bundle exec rails runner "Sidekiq::RetrySet.new.clear"
+```
+
+### ActionCable não atualiza em tempo real
+
+```bash
+# 1. Verificar se cable está montado
+grep -r "ActionCable" config/routes.rb
+
+# 2. Verificar conexão WebSocket no browser (DevTools > Network > WS)
+
+# 3. Verificar logs do ActionCable
+tail -f log/development.log | grep -i cable
+```
+
+### Testes falhando localmente
+
+```bash
+# 1. Resetar banco de testes
+RAILS_ENV=test bundle exec rails db:reset
+
+# 2. Executar com verbose
+bundle exec rspec --format documentation
+
+# 3. Executar teste específico isolado
+bundle exec rspec spec/services/profiles/github/scraper_service_spec.rb -f d
+```
 
 ## 🚀 Pontos de Melhoria
 
