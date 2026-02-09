@@ -172,7 +172,7 @@ RSpec.describe GithubScraperJob, type: :job do
   describe 'sidekiq_retries_exhausted' do
     let(:profile) { create(:profile, github_username: 'testuser') }
     let(:exception) { StandardError.new("Browser timeout") }
-    let(:job_hash) { { "args" => [profile.id] } }
+    let(:job_hash) { { "args" => [ profile.id ] } }
     let(:broadcaster) { instance_double(Profiles::Github::Broadcaster) }
 
     before do
@@ -207,7 +207,7 @@ RSpec.describe GithubScraperJob, type: :job do
     end
 
     context 'when profile does not exist' do
-      let(:job_hash) { { "args" => [999_999] } }
+      let(:job_hash) { { "args" => [ 999_999 ] } }
 
       it 'does not raise error' do
         expect do

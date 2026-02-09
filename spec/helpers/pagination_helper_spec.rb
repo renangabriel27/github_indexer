@@ -11,7 +11,7 @@ RSpec.describe PaginationHelper do
       let(:current_page) { 3 }
 
       it "returns all pages without ellipsis" do
-        expect(helper.pagy_series(pagy)).to eq([1, 2, 3, 4, 5])
+        expect(helper.pagy_series(pagy)).to eq([ 1, 2, 3, 4, 5 ])
       end
     end
 
@@ -20,7 +20,7 @@ RSpec.describe PaginationHelper do
       let(:current_page) { 2 }
 
       it "shows first pages with ellipsis at end" do
-        expect(helper.pagy_series(pagy)).to eq([1, 2, 3, 4, "...", 10])
+        expect(helper.pagy_series(pagy)).to eq([ 1, 2, 3, 4, "...", 10 ])
       end
     end
 
@@ -29,7 +29,7 @@ RSpec.describe PaginationHelper do
       let(:current_page) { 9 }
 
       it "shows last pages with ellipsis at start" do
-        expect(helper.pagy_series(pagy)).to eq([1, "...", 7, 8, 9, 10])
+        expect(helper.pagy_series(pagy)).to eq([ 1, "...", 7, 8, 9, 10 ])
       end
     end
 
@@ -38,7 +38,7 @@ RSpec.describe PaginationHelper do
       let(:current_page) { 5 }
 
       it "shows current page with ellipsis on both sides" do
-        expect(helper.pagy_series(pagy)).to eq([1, "...", 4, 5, 6, "...", 10])
+        expect(helper.pagy_series(pagy)).to eq([ 1, "...", 4, 5, 6, "...", 10 ])
       end
     end
   end

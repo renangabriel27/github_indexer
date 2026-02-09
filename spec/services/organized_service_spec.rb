@@ -16,7 +16,7 @@ RSpec.describe OrganizedService do
     end
 
     def steps
-      [:add_one, :multiply_by_two, :subtract_three]
+      [ :add_one, :multiply_by_two, :subtract_three ]
     end
 
     def add_one(ctx)
@@ -51,7 +51,7 @@ RSpec.describe OrganizedService do
     end
 
     def steps
-      [:step_one, :step_two, :step_three]
+      [ :step_one, :step_two, :step_three ]
     end
 
     def step_one(ctx)
@@ -79,7 +79,7 @@ RSpec.describe OrganizedService do
         result = TestOrganizedService.call(5)
 
         expect(result).to be_success
-        expect(result.value![:result]).to eq(["add_one", "multiply_by_two", "subtract_three"])
+        expect(result.value![:result]).to eq([ "add_one", "multiply_by_two", "subtract_three" ])
       end
 
       it "transforms context through the pipeline" do

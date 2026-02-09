@@ -42,14 +42,14 @@ module PaginationHelper
   end
 
   def build_start_series(total_pages)
-    [*1..4, ELLIPSIS, total_pages]
+    [ *1..4, ELLIPSIS, total_pages ]
   end
 
   def build_end_series(total_pages)
-    [1, ELLIPSIS, *(total_pages - 3..total_pages)]
+    [ 1, ELLIPSIS, *(total_pages - 3..total_pages) ]
   end
 
   def build_middle_series(current_page, total_pages)
-    [1, ELLIPSIS, *(current_page - 1..current_page + 1), ELLIPSIS, total_pages]
+    [ 1, ELLIPSIS, *(current_page - 1..current_page + 1), ELLIPSIS, total_pages ]
   end
 end

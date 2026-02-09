@@ -29,7 +29,7 @@ RSpec.describe Profiles::Github::Extractors::OrganizationsExtractor do
 
       it "extracts organizations from aria-label" do
         result = extractor.call.value!
-        expect(result[:organizations]).to eq(["Linux Foundation", "Ruby on Rails"])
+        expect(result[:organizations]).to eq([ "Linux Foundation", "Ruby on Rails" ])
       end
     end
 
@@ -51,7 +51,7 @@ RSpec.describe Profiles::Github::Extractors::OrganizationsExtractor do
 
       it "extracts from img alt and removes @ prefix" do
         result = extractor.call.value!
-        expect(result[:organizations]).to eq(["github", "microsoft"])
+        expect(result[:organizations]).to eq([ "github", "microsoft" ])
       end
     end
 
@@ -73,7 +73,7 @@ RSpec.describe Profiles::Github::Extractors::OrganizationsExtractor do
 
       it "prefers aria-label over img alt" do
         result = extractor.call.value!
-        expect(result[:organizations]).to eq(["Linux Foundation", "github"])
+        expect(result[:organizations]).to eq([ "Linux Foundation", "github" ])
       end
     end
 
@@ -95,7 +95,7 @@ RSpec.describe Profiles::Github::Extractors::OrganizationsExtractor do
 
       it "removes duplicates" do
         result = extractor.call.value!
-        expect(result[:organizations]).to eq(["GitHub"])
+        expect(result[:organizations]).to eq([ "GitHub" ])
       end
     end
 
@@ -144,7 +144,7 @@ RSpec.describe Profiles::Github::Extractors::OrganizationsExtractor do
 
       it "filters out blank names" do
         result = extractor.call.value!
-        expect(result[:organizations]).to eq(["Valid Org"])
+        expect(result[:organizations]).to eq([ "Valid Org" ])
       end
     end
 
@@ -163,7 +163,7 @@ RSpec.describe Profiles::Github::Extractors::OrganizationsExtractor do
 
       it "removes @ prefix from alt text" do
         result = extractor.call.value!
-        expect(result[:organizations]).to eq(["my-org-name"])
+        expect(result[:organizations]).to eq([ "my-org-name" ])
       end
     end
 
@@ -182,7 +182,7 @@ RSpec.describe Profiles::Github::Extractors::OrganizationsExtractor do
 
       it "keeps name as is if no @ prefix" do
         result = extractor.call.value!
-        expect(result[:organizations]).to eq(["plain-name"])
+        expect(result[:organizations]).to eq([ "plain-name" ])
       end
     end
   end
