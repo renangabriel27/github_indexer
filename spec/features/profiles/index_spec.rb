@@ -80,7 +80,8 @@ RSpec.describe 'Profiles Index', type: :feature do
       profile = create(:profile, name: 'Test User', github_username: 'testuser')
       visit profiles_path
 
-      find_link(href: profile_path(profile), match: :first).click
+      # Click on the first profile name link in the card
+      first(:link, 'Test User').click
 
       expect(page).to have_current_path(profile_path(profile))
       expect(page).to have_content('Test User')

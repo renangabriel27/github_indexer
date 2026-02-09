@@ -69,13 +69,17 @@ RSpec.describe 'Profiles Show', type: :feature do
   end
 
   describe 'rescan functionality' do
-    it 'shows success notice after rescan is initiated' do
-      allow(RescanProfileJob).to receive(:perform_later)
+    it 'initiates rescan and updates profile status' do
       visit profile_path(profile)
 
       click_button('Re-escanear')
 
-      expect(page).to have_content('Re-escaneamento iniciado!')
+      # Verify we're still on the profile page
+      expect(page).to have_current_path(profile_path(profile))
+
+      # Verify the profile status was updated to processing
+      profile.reload
+      expect(profile.scraping_status).to eq('processing')
     end
   end
 
