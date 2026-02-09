@@ -40,14 +40,15 @@
         <button
           type="button"
           data-action="click->modal#close"
-          class="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-lg text-white font-medium transition-colors">
+          class="w-full sm:flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-lg text-white font-medium transition-colors">
           <%= cancel_text %>
         </button>
 
         <% if confirm_url %>
           <%= button_to confirm_url,
               method: confirm_method,
-              class: "flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium transition-colors" do %>
+              form: { class: "w-full sm:flex-1" },
+              class: "w-full px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium transition-colors" do %>
             <%= confirm_text %>
           <% end %>
         <% end %>
