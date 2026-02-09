@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center gap-4">
     <!-- Pagination Controls - sempre mostra quando há mais de 1 página -->
     <% if pagy.pages > 1 %>
-      <div class="flex items-center justify-center gap-2 sm:gap-6 w-full px-4 overflow-x-auto">
+      <div class="flex items-center justify-center gap-2 sm:gap-6 w-full px-4">
         <!-- Previous Button -->
         <% if pagy_prev_page(pagy) %>
           <%= link_to profiles_path(request.query_parameters.merge(page: pagy_prev_page(pagy))),
