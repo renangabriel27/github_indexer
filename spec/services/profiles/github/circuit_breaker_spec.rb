@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 require "rails_helper"
+require "mock_redis"
 
 RSpec.describe Profiles::Github::CircuitBreaker do
-  let(:redis) { Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0")) }
+  let(:redis) { MockRedis.new }
   let(:circuit_breaker) { described_class.new(redis: redis) }
 
   before do
