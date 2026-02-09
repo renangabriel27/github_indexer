@@ -10,7 +10,6 @@ require 'rspec/rails'
 require 'support/shoulda'
 require 'support/capybara'
 require 'support/database_cleaner'
-require 'support/simplecov'
 require 'support/webmock'
 
 # Load shared contexts

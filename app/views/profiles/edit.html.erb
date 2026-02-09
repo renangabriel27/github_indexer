@@ -1,6 +1,12 @@
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 py-12">
   <div class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
 
+    <!-- Flash Messages -->
+    <div id="flash-container" class="mb-6">
+      <%= render Ui::FlashComponent.new(message: notice, type: :notice) if notice.present? %>
+      <%= render Ui::FlashComponent.new(message: alert, type: :alert) if alert.present? %>
+    </div>
+
     <!-- Back Button -->
     <div class="mb-6">
       <%= render Ui::BackLinkComponent.new(text: "Voltar para o perfil", href: @profile) %>

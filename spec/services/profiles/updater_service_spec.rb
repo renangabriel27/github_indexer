@@ -97,6 +97,30 @@ RSpec.describe Profiles::UpdaterService do
         ActiveJob::Base.queue_adapter.enqueued_jobs.clear
       end
 
+      it "returns failure with rate limit error" do
+        result = service.call
+
+        expect(result).to be_failure
+        expect(result.failure[:error]).to eq(:rate_limit_exceeded)
+        expect(result.failure[:profile]).to eq(profile)
+      end
+
+      it "includes time remaining in failure result" do
+        result = service.call
+
+        expect(result.failure[:time_remaining]).to be > 0
+        expect(result.failure[:time_remaining]).to be <= 180 # 3 minutes in seconds
+      end
+
+      it "does not update the profile" do
+        original_username = profile.github_username
+
+        service.call
+        profile.reload
+
+        expect(profile.github_username).to eq(original_username)
+      end
+
       it "does not enqueue jobs" do
         service.call
 
@@ -104,20 +128,26 @@ RSpec.describe Profiles::UpdaterService do
         expect(UrlShortenerJob).not_to have_been_enqueued
       end
 
-      it "still resets scraping data" do
+      it "does not reset scraping data" do
         profile.update!(scraping_status: "completed", last_error: "Some error")
+        original_status = profile.scraping_status
+        original_scanned_at = profile.last_scanned_at
 
         service.call
         profile.reload
 
-        expect(profile.scraping_status).to eq("pending")
-        expect(profile.last_scanned_at).to be_nil
-        expect(profile.last_error).to be_nil
+        expect(profile.scraping_status).to eq(original_status)
+        expect(profile.last_scanned_at).to be_within(1.second).of(original_scanned_at)
       end
     end
 
     context "when update fails validation" do
       let(:params) { { github_username: "-invalid" } }
+
+      before do
+        # Ensure profile can be rescanned so rate limit doesn't interfere
+        profile.update_columns(last_scanned_at: 10.minutes.ago)
+      end
 
       it "returns failure" do
         result = service.call

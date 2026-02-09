@@ -37,6 +37,39 @@ RSpec.describe 'Profiles Edit', type: :feature do
       expect(page).to have_content('Updated Name')
     end
 
+    it 'prevents username update if scanned within 5 minutes' do
+      recent_profile = create(:profile,
+                             name: 'Recent Name',
+                             github_username: 'recentuser',
+                             last_scanned_at: 2.minutes.ago)
+
+      visit edit_profile_path(recent_profile)
+
+      fill_in 'profile[name]', with: 'New Name'
+      fill_in 'profile[github_username]', with: 'newusername'
+
+      click_button('Atualizar Perfil')
+
+      expect(page).to have_current_path(edit_profile_path(recent_profile))
+      expect(page).to have_content(/aguarde.*minutos/i)
+    end
+
+    it 'allows name update even if scanned within 5 minutes' do
+      recent_profile = create(:profile,
+                             name: 'Recent Name',
+                             github_username: 'recentuser',
+                             last_scanned_at: 2.minutes.ago)
+
+      visit edit_profile_path(recent_profile)
+
+      fill_in 'profile[name]', with: 'Updated Name Only'
+
+      click_button('Atualizar Perfil')
+
+      expect(page).to have_current_path(profile_path(recent_profile))
+      expect(page).to have_content('Perfil atualizado com sucesso')
+    end
+
     it 'displays validation errors for empty fields' do
       visit edit_profile_path(profile)
 

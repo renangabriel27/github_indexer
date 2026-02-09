@@ -2,6 +2,7 @@
 
 class ProfilesController < ApplicationController
   include Paginatable
+  helper ProfilesHelper
 
   before_action :set_profile, only: [ :show, :edit, :update, :destroy, :rescan, :status ]
 
@@ -37,8 +38,7 @@ class ProfilesController < ApplicationController
     if result.success?
       redirect_to result.value![:profile], notice: t("profiles.messages.updated")
     else
-      @profile = result.failure[:profile]
-      render :edit, status: :unprocessable_entity
+      handle_update_failure(result)
     end
   end
 
@@ -62,7 +62,7 @@ class ProfilesController < ApplicationController
       format.json do
         render json: {
           status: @profile.scraping_status,
-          message: status_message,
+          message: I18n.t("profiles.progress.#{@profile.scraping_status}", default: ""),
           last_error: @profile.last_error
         }
       end
@@ -71,16 +71,15 @@ class ProfilesController < ApplicationController
 
   private
 
-  def status_message
-    case @profile.scraping_status
-    when "completed"
-      t("profiles.progress.completed")
-    when "failed"
-      t("profiles.progress.failed")
-    when "processing"
-      t("profiles.progress.preparing")
+  def handle_update_failure(result)
+    case result.failure[:error]
+    when :rate_limit_exceeded
+      time_remaining = helpers.format_rescan_wait_time(result.failure[:time_remaining])
+      redirect_to edit_profile_path(@profile),
+                  alert: t("profiles.messages.update_wait", time_remaining: time_remaining)
     else
-      ""
+      @profile = result.failure[:profile]
+      render :edit, status: :unprocessable_entity
     end
   end
 

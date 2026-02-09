@@ -6,6 +6,11 @@ pt-BR:
       deleted: "Perfil removido com sucesso!"
       rescan_started: "Re-escaneamento iniciado!"
       rescan_wait: "Aguarde alguns minutos antes de re-escanear novamente"
+      update_wait: "Não é possível atualizar o username do GitHub neste momento. Por favor, aguarde %{time_remaining} antes de tentar novamente."
+    time:
+      moments: "alguns instantes"
+      one_minute: "1 minuto"
+      minutes: "%{count} minutos"
     progress:
       preparing: "Preparando scraping..."
       navigating: "Acessando perfil do GitHub..."

@@ -8,6 +8,14 @@ module Profiles
     end
 
     def call
+      if username_will_change? && !@profile.can_rescan?
+        return Failure(
+          error: :rate_limit_exceeded,
+          profile: @profile,
+          time_remaining: calculate_time_remaining
+        )
+      end
+
       username_changed = username_will_change?
       should_enqueue = username_changed && @profile.can_rescan?
 
@@ -38,6 +46,13 @@ module Profiles
     def enqueue_jobs
       GithubScraperJob.perform_later(@profile.id, update_name: true)
       UrlShortenerJob.perform_later(@profile.id)
+    end
+
+    def calculate_time_remaining
+      return 0 unless @profile.last_scanned_at
+
+      remaining = 5.minutes - (Time.current - @profile.last_scanned_at)
+      remaining.positive? ? remaining.to_i : 0
     end
 
     def failure_result

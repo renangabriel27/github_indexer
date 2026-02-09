@@ -36,6 +36,20 @@ en:
       deleted: "Profile removed successfully!"
       rescan_started: "Rescan started!"
       rescan_wait: "Please wait a few minutes before rescanning again"
+      update_wait: "Cannot update GitHub username at this time. Please wait %{time_remaining} before trying again."
+    time:
+      moments: "a few moments"
+      one_minute: "1 minute"
+      minutes: "%{count} minutes"
+    progress:
+      preparing: "Preparing scraping..."
+      navigating: "Accessing GitHub profile..."
+      loading: "Waiting for page to load..."
+      collecting: "Collecting profile data..."
+      contributions: "Processing last year contributions..."
+      finalizing: "Finalizing update..."
+      completed: "Profile updated successfully!"
+      failed: "Error updating profile. Try again."
   errors:
     not_found:
       title: "Page Not Found"
