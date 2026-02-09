@@ -27,6 +27,23 @@ Uma ferramenta para indexação e busca de perfis do GitHub.
 - [📄 Licença](#-licença)
 - [👤 Autor](#-autor)
 
+## 📸 Screenshots
+
+### Lista de Perfis
+![Lista de Perfis](public/screenshots/profile-list.png)
+
+### Detalhes do Perfil
+![Detalhes do Perfil](public/screenshots/profile-detail.png)
+
+### Progresso de Scraping
+![Progresso de Scraping](public/screenshots/profile-progress.png)
+
+### Versão Mobile
+![Versão Mobile](public/screenshots/profile-mobile.jpeg)
+
+### Documentação da API (Swagger)
+![Documentação da API](public/screenshots/api-docs.png)
+
 ## ✨ Funcionalidades
 
 - **Gerenciamento de Perfis**: Cadastre, indexe, busque e gerencie perfis do GitHub
