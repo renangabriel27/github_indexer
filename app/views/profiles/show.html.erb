@@ -42,7 +42,7 @@
       <!-- Action Buttons -->
       <div class="p-6 sm:p-8 bg-slate-900/50 flex flex-col sm:flex-row sm:flex-wrap gap-3">
         <%= button_to rescan_profile_path(@profile),
-            class: "inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white font-semibold hover:shadow-lg hover:shadow-indigo-500/50 transition-all duration-200 hover:scale-105" do %>
+            class: "inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white font-semibold hover:shadow-lg hover:shadow-indigo-500/50 transition-all duration-200 hover:scale-105 w-full sm:w-auto" do %>
           <%= render Ui::IconComponent.new(name: :refresh, size: :md) %>
           Re-escanear
         <% end %>
