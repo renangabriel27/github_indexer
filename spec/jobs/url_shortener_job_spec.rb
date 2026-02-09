@@ -62,10 +62,15 @@ RSpec.describe UrlShortenerJob, type: :job do
           end.not_to raise_error
         end
 
-        it 'does not update the profile' do
+        it 'updates the profile with the original GitHub URL as fallback' do
           expect do
             described_class.new.perform(profile.id)
-          end.not_to change { profile.reload.short_github_url }
+          end.to change { profile.reload.short_github_url }.to(expected_github_url)
+        end
+
+        it 'logs a warning about using fallback' do
+          expect(Rails.logger).to receive(:warn).with(/Fallback used for profile_id=#{profile.id}/)
+          described_class.new.perform(profile.id)
         end
       end
     end

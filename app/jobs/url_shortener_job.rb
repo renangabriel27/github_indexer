@@ -39,7 +39,12 @@ class UrlShortenerJob < ApplicationJob
       error = result.failure
       Rails.logger.error("UrlShortenerJob: Failed for profile_id=#{profile_id}, error=#{error[:error]}, message=#{error[:message]}")
 
-      raise StandardError, error[:message] if error[:retryable]
+      if error[:retryable]
+        raise StandardError, error[:message]
+      else
+        profile.update_columns(short_github_url: github_url)
+        Rails.logger.warn("UrlShortenerJob: Fallback used for profile_id=#{profile_id}, using original URL")
+      end
     end
   end
 end
