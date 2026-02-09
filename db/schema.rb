@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_04_011900) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_09_221141) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -30,7 +30,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_04_011900) do
     t.string "short_github_url"
     t.integer "stars", default: 0
     t.datetime "updated_at", null: false
-    t.index ["github_username"], name: "index_profiles_on_github_username"
+    t.index "lower((github_username)::text)", name: "index_profiles_on_lower_github_username", unique: true
     t.index ["short_github_url"], name: "index_profiles_on_short_github_url", unique: true
   end
 end
