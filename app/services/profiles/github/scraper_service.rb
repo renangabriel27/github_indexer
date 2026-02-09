@@ -11,11 +11,15 @@ module Profiles
       end
 
       def call
+        @broadcaster = Broadcaster.new(@profile)
         @profile.update(scraping_status: :processing)
+        @broadcaster.broadcast_status(:preparing)
         Success(perform_scraping)
-      rescue ProfileNotFoundError => e
+      rescue Profiles::ProfileNotFoundError => e
+        @broadcaster.broadcast_error(e.message) if @broadcaster
         @error_handler.handle_not_found_error(e)
       rescue StandardError => e
+        @broadcaster.broadcast_error(e.message) if @broadcaster
         @error_handler.handle_standard_error(e)
       end
 
@@ -25,12 +29,17 @@ module Profiles
         browser_manager = BrowserManager.new
 
         begin
+          @broadcaster.broadcast_status(:navigating)
           browser_manager.navigate_to(@github_url)
           PageValidator.new(browser_manager.browser).validate!
+
+          @broadcaster.broadcast_status(:loading)
           browser_manager.wait_for_contributions(username: @profile.github_username)
 
+          @broadcaster.broadcast_status(:collecting)
           parsed_data = HtmlParser.new(browser_manager.html, update_name: @update_name).parse
 
+          @broadcaster.broadcast_status(:finalizing)
           @profile.update!(
             **parsed_data,
             scraping_status: :completed,
@@ -38,6 +47,7 @@ module Profiles
             last_error: nil
           )
 
+          @broadcaster.broadcast_completion
           @profile
         ensure
           browser_manager.quit

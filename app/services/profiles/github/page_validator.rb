@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module Profiles
-  class ProfileNotFoundError < StandardError; end
-
   module Github
     class PageValidator
       def initialize(browser)
@@ -24,7 +22,7 @@ module Profiles
         status = browser.status
 
         if status == 404
-          raise ProfileNotFoundError, "Perfil não encontrado (404)"
+          raise Profiles::ProfileNotFoundError, "Perfil não encontrado (404)"
         elsif status >= 400
           raise StandardError, "Erro HTTP #{status} ao acessar perfil"
         end
@@ -36,7 +34,7 @@ module Profiles
         title = browser.at_css(Selectors::TITLE_TAG)&.text&.downcase || ""
 
         if title.include?("404") || title.include?("not found")
-          raise ProfileNotFoundError, "Perfil não encontrado"
+          raise Profiles::ProfileNotFoundError, "Perfil não encontrado"
         end
       end
 
@@ -46,7 +44,7 @@ module Profiles
         return if has_profile
 
         if Selectors::ERROR_PATTERNS.any? { |pattern| html.match?(pattern) }
-          raise ProfileNotFoundError, "Perfil não encontrado"
+          raise Profiles::ProfileNotFoundError, "Perfil não encontrado"
         end
       end
     end

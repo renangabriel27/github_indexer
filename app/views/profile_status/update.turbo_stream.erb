@@ -1,0 +1,38 @@
+<%# Update progress modal message %>
+<%= turbo_stream.replace "progress-modal-message" do %>
+  <p id="progress-modal-message"
+     class="text-slate-300 text-sm"
+     data-profile-progress-target="message">
+    <%= @message %>
+  </p>
+<% end %>
+
+<%# Update stats when completed %>
+<% if @completed && @profile %>
+  <%= turbo_stream.replace "profile-stats-frame" do %>
+    <turbo-frame id="profile-stats-frame">
+      <%= render partial: "profiles/stats", locals: { profile: @profile } %>
+    </turbo-frame>
+  <% end %>
+<% end %>
+
+<%# Hide processing banner %>
+<% if @completed || @failed %>
+  <%= turbo_stream.update "processing-banner" do %>
+    <div id="processing-banner" class="hidden"></div>
+  <% end %>
+<% end %>
+
+<%# Show success flash on completion %>
+<% if @completed %>
+  <%= turbo_stream.prepend "flash-container" do %>
+    <%= render Ui::FlashComponent.new(message: @message, type: :notice) %>
+  <% end %>
+<% end %>
+
+<%# Show error flash on failure %>
+<% if @failed %>
+  <%= turbo_stream.prepend "flash-container" do %>
+    <%= render Ui::FlashComponent.new(message: @message, type: :alert) %>
+  <% end %>
+<% end %>

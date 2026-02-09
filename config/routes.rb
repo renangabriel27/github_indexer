@@ -7,11 +7,15 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => "/sidekiq"
   end
 
+  # ActionCable for real-time updates
+  mount ActionCable.server => "/cable"
+
   root "profiles#index"
 
   resources :profiles do
     member do
       post :rescan
+      get :status
     end
   end
 

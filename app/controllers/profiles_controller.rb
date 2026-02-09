@@ -3,7 +3,7 @@
 class ProfilesController < ApplicationController
   include Paginatable
 
-  before_action :set_profile, only: [ :show, :edit, :update, :destroy, :rescan ]
+  before_action :set_profile, only: [ :show, :edit, :update, :destroy, :rescan, :status ]
 
   def index
     profiles = ProfilesFilterQuery.call(filter_params)
@@ -21,7 +21,7 @@ class ProfilesController < ApplicationController
     result = Profiles::CreatorService.call(profile_params)
 
     if result.success?
-      redirect_to result.value![:profile], notice: t("profiles.messages.created")
+      redirect_to result.value![:profile]
     else
       @profile = result.failure[:profile]
       render :new, status: :unprocessable_entity
@@ -56,7 +56,32 @@ class ProfilesController < ApplicationController
     end
   end
 
+  def status
+    respond_to do |format|
+      format.json do
+        render json: {
+          status: @profile.scraping_status,
+          message: status_message,
+          last_error: @profile.last_error
+        }
+      end
+    end
+  end
+
   private
+
+  def status_message
+    case @profile.scraping_status
+    when "completed"
+      t("profiles.progress.completed")
+    when "failed"
+      t("profiles.progress.failed")
+    when "processing"
+      t("profiles.progress.preparing")
+    else
+      ""
+    end
+  end
 
   def set_profile
     @profile = Profile.find(params[:id])

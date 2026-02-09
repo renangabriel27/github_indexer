@@ -11,6 +11,8 @@ gem "propshaft"
 gem "view_component"
 gem "importmap-rails"
 gem "tailwindcss-rails"
+gem "turbo-rails"
+gem "stimulus-rails"
 
 # Scraping
 gem "nokogiri"

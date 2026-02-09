@@ -1,0 +1,63 @@
+<div id="progress-modal"
+     class="fixed inset-0 z-50 flex items-center justify-center"
+     data-controller="profile-progress"
+     data-profile-progress-profile-id-value="<%= profile_id %>"
+     data-profile-progress-status-value="<%= current_status %>"
+     style="display: none;">
+
+  <!-- Backdrop -->
+  <div class="fixed inset-0 bg-black/70 transition-opacity opacity-0"
+       data-profile-progress-target="backdrop"></div>
+
+  <!-- Modal Content -->
+  <div class="relative bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all scale-95"
+       data-profile-progress-target="content"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="progress-modal-title">
+
+    <!-- Spinner and Status -->
+    <div class="flex flex-col items-center space-y-6">
+      <!-- Animated Spinner -->
+      <div class="relative">
+        <div class="w-20 h-20 border-4 border-slate-600 border-t-indigo-500 rounded-full animate-spin"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <%= render Ui::IconComponent.new(name: :github, size: :lg, css_class: "text-slate-400") %>
+        </div>
+      </div>
+
+      <!-- Status Message -->
+      <div class="text-center space-y-2">
+        <h3 id="progress-modal-title" class="text-xl font-bold text-white">
+          Atualizando Perfil
+        </h3>
+        <p id="progress-modal-message"
+           class="text-slate-300 text-sm"
+           data-profile-progress-target="message">
+          <%= status_message %>
+        </p>
+      </div>
+
+      <!-- Progress Indicator -->
+      <div class="w-full">
+        <div class="h-1 bg-slate-700 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-pulse"
+               style="width: 60%;"></div>
+        </div>
+        <p class="text-xs text-slate-400 text-center mt-3">
+          Isso pode levar alguns segundos...
+        </p>
+      </div>
+    </div>
+
+    <!-- Hidden close button for accessibility (will be shown on error) -->
+    <button type="button"
+            id="progress-modal-close"
+            class="hidden absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+            data-action="click->profile-progress#close"
+            data-profile-progress-target="closeButton"
+            aria-label="Fechar modal">
+      <%= render Ui::IconComponent.new(name: :x_mark, size: :md) %>
+    </button>
+  </div>
+</div>

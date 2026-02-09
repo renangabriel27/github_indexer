@@ -6,6 +6,15 @@ pt-BR:
       deleted: "Perfil removido com sucesso!"
       rescan_started: "Re-escaneamento iniciado!"
       rescan_wait: "Aguarde alguns minutos antes de re-escanear novamente"
+    progress:
+      preparing: "Preparando scraping..."
+      navigating: "Acessando perfil do GitHub..."
+      loading: "Aguardando página carregar..."
+      collecting: "Coletando dados do perfil..."
+      contributions: "Processando contribuições do último ano..."
+      finalizing: "Finalizando atualização..."
+      completed: "Perfil atualizado com sucesso!"
+      failed: "Erro ao atualizar perfil. Tente novamente."
   activerecord:
     models:
       profile: "Perfil"
