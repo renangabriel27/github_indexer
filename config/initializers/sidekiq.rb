@@ -5,6 +5,14 @@ Sidekiq.configure_server do |config|
     pool_timeout: 5
   }
 
+  # Limita concorrência da fila :scraping para reduzir uso de memória do Ferrum
+  # Cada instância do Ferrum consome ~100MB RAM
+  # Com concurrency 2, máximo 2 browsers simultâneos = ~200MB
+  config.capsule("scraping") do |cap|
+    cap.concurrency = 2
+    cap.queues = [ "scraping" ]
+  end
+
   config.on(:startup) do
     Rails.logger.info "Sidekiq server started - queues: #{config.queues}"
   end

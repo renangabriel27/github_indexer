@@ -1,4 +1,13 @@
+# Configuração global para filas leves (default)
 :concurrency: 5
 :queues:
   - default
-  - scraping
+
+# Capsule para fila :scraping com concorrência limitada
+# Cada job de scraping consome ~100MB RAM (Ferrum/Chrome)
+# Com concurrency 2, máximo 200MB simultâneos
+:capsules:
+  scraping:
+    :concurrency: 2
+    :queues:
+      - scraping

@@ -4,6 +4,7 @@ class GithubScraperJob < ApplicationJob
   include ProfileScrapingRetry
 
   queue_as :scraping
+  sidekiq_options retry: 3, dead: false
 
   def perform(profile_id, update_name: false)
     profile = find_record_safely(Profile, profile_id)
