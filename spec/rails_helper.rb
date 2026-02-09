@@ -12,8 +12,9 @@ require 'support/capybara'
 require 'support/database_cleaner'
 require 'support/webmock'
 
-# Load shared contexts
+# Load shared contexts and shared examples
 Dir[Rails.root.join('spec/support/shared_contexts/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('spec/support/shared_examples/**/*.rb')].each { |f| require f }
 
 begin
   ActiveRecord::Migration.maintain_test_schema!

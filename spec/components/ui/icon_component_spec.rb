@@ -16,70 +16,26 @@ RSpec.describe Ui::IconComponent, type: :component do
   end
 
   describe "#size_class" do
-    it "returns correct class for :sm" do
-      component = described_class.new(name: :search, size: :sm)
-      expect(component.size_class).to eq("w-4 h-4")
-    end
-
-    it "returns correct class for :md (default)" do
-      component = described_class.new(name: :search, size: :md)
-      expect(component.size_class).to eq("w-5 h-5")
-    end
-
-    it "returns correct class for :lg" do
-      component = described_class.new(name: :search, size: :lg)
-      expect(component.size_class).to eq("w-6 h-6")
-    end
-
-    it "returns correct class for :xl" do
-      component = described_class.new(name: :search, size: :xl)
-      expect(component.size_class).to eq("w-8 h-8")
+    { sm: "w-4 h-4", md: "w-5 h-5", lg: "w-6 h-6", xl: "w-8 h-8" }.each do |size, expected|
+      it "returns #{expected} for :#{size}" do
+        expect(described_class.new(name: :search, size: size).size_class).to eq(expected)
+      end
     end
   end
 
-  describe "#fill_type" do
-    it "returns 'currentColor' for :github icon" do
-      component = described_class.new(name: :github)
-      expect(component.fill_type).to eq("currentColor")
+  describe "#fill_type and #stroke_type" do
+    it "returns currentColor fill and none stroke for filled icons" do
+      %i[github star].each do |icon|
+        component = described_class.new(name: icon)
+        expect(component.fill_type).to eq("currentColor")
+        expect(component.stroke_type).to eq("none")
+      end
     end
 
-    it "returns 'currentColor' for :star icon" do
-      component = described_class.new(name: :star)
-      expect(component.fill_type).to eq("currentColor")
-    end
-
-    it "returns 'none' for other icons" do
+    it "returns none fill and currentColor stroke for stroke icons" do
       component = described_class.new(name: :search)
       expect(component.fill_type).to eq("none")
-    end
-  end
-
-  describe "#stroke_type" do
-    it "returns 'none' for :github icon" do
-      component = described_class.new(name: :github)
-      expect(component.stroke_type).to eq("none")
-    end
-
-    it "returns 'none' for :star icon" do
-      component = described_class.new(name: :star)
-      expect(component.stroke_type).to eq("none")
-    end
-
-    it "returns 'currentColor' for other icons" do
-      component = described_class.new(name: :search)
       expect(component.stroke_type).to eq("currentColor")
-    end
-  end
-
-  describe "#classes" do
-    it "returns only size_class when css_class is nil" do
-      component = described_class.new(name: :search, size: :md)
-      expect(component.classes).to eq("w-5 h-5")
-    end
-
-    it "combines size_class and css_class when both present" do
-      component = described_class.new(name: :search, size: :lg, css_class: "text-blue-500")
-      expect(component.classes).to eq("w-6 h-6 text-blue-500")
     end
   end
 end

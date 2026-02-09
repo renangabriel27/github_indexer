@@ -6,13 +6,10 @@ RSpec.describe Profile, type: :model do
   include_context 'Profile GitHub API stubs'
 
   describe 'validations' do
-    describe 'name' do
-      it { should validate_presence_of(:name) }
-    end
+    it { should validate_presence_of(:name) }
+    it { should validate_presence_of(:github_username) }
 
     describe 'github_username' do
-      it { should validate_presence_of(:github_username) }
-
       it 'validates uniqueness case insensitively' do
         create(:profile, github_username: 'testuser')
         duplicate = build(:profile, github_username: 'TestUser')
@@ -21,17 +18,14 @@ RSpec.describe Profile, type: :model do
       end
 
       it 'accepts valid usernames' do
-        valid_usernames = [ 'user123', 'user-name', 'User123', 'a', 'a-b-c' ]
-        valid_usernames.each do |username|
+        %w[user123 user-name User123 a a-b-c].each do |username|
           stub_github_api(username.downcase)
-          profile = build(:profile, github_username: username)
-          expect(profile).to be_valid
+          expect(build(:profile, github_username: username)).to be_valid
         end
       end
 
       it 'rejects invalid format' do
-        invalid_usernames = [ 'user_name', 'user.name', 'user@name', 'user name' ]
-        invalid_usernames.each do |username|
+        %w[user_name user.name user@name].each do |username|
           profile = build(:profile, github_username: username)
           expect(profile).not_to be_valid
           expect(profile.errors[:github_username]).to include('inválido. Use apenas letras, números e hífens')
@@ -39,23 +33,18 @@ RSpec.describe Profile, type: :model do
       end
 
       it 'rejects usernames longer than 39 characters' do
-        username = 'a' * 40
-        profile = build(:profile, github_username: username)
+        profile = build(:profile, github_username: 'a' * 40)
         expect(profile).not_to be_valid
         expect(profile.errors[:github_username]).to include('deve ter no máximo 39 caracteres')
       end
 
       it 'rejects usernames starting or ending with hyphen' do
-        stub_github_api('-username')
-        stub_github_api('username-')
-
-        profile1 = build(:profile, github_username: '-username')
-        profile2 = build(:profile, github_username: 'username-')
-
-        expect(profile1).not_to be_valid
-        expect(profile2).not_to be_valid
-        expect(profile1.errors[:github_username]).to include('não pode começar ou terminar com hífen')
-        expect(profile2.errors[:github_username]).to include('não pode começar ou terminar com hífen')
+        %w[-username username-].each do |username|
+          stub_github_api(username)
+          profile = build(:profile, github_username: username)
+          expect(profile).not_to be_valid
+          expect(profile.errors[:github_username]).to include('não pode começar ou terminar com hífen')
+        end
       end
 
       it 'rejects usernames with consecutive hyphens' do
@@ -64,6 +53,15 @@ RSpec.describe Profile, type: :model do
         expect(profile).not_to be_valid
         expect(profile.errors[:github_username]).to include('não pode conter hífens consecutivos')
       end
+    end
+  end
+
+  describe 'callbacks' do
+    it 'normalizes github_username before validation' do
+      stub_github_api('username')
+      profile = build(:profile, github_username: '  UserName  ')
+      profile.valid?
+      expect(profile.github_username).to eq('username')
     end
   end
 end

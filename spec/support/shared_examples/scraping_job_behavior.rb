@@ -1,29 +1,26 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-
-RSpec.describe RescanProfileJob, type: :job do
-  # Note: RescanService uses different interface - it receives profile directly without options hash
+RSpec.shared_examples 'a scraping job' do |service_class, service_options|
   include_context 'Profile GitHub API stubs'
   include Dry::Monads::Result::Mixin
 
-  let(:profile) { create(:profile, github_username: 'testuser', last_scanned_at: 10.minutes.ago) }
+  let(:profile) { create(:profile, github_username: 'testuser') }
 
   describe '#perform' do
-    context 'when service succeeds' do
+    context 'when profile exists and service succeeds' do
       before do
-        allow(Profiles::RescanService).to receive(:call).and_return(Success({ profile: profile }))
+        allow(service_class).to receive(:call).and_return(Success({ profile: profile }))
       end
 
-      it 'calls RescanService with the profile' do
+      it 'calls the service with correct parameters' do
         described_class.new.perform(profile.id)
-        expect(Profiles::RescanService).to have_received(:call).with(profile)
+        expect(service_class).to have_received(:call).with(profile, **service_options)
       end
     end
 
     context 'when service fails with retryable error' do
       before do
-        allow(Profiles::RescanService).to receive(:call)
+        allow(service_class).to receive(:call)
           .and_return(Failure(error: :timeout, message: "Timeout", retryable: true))
         allow(Rails.logger).to receive(:info)
         allow(Rails.logger).to receive(:error)
@@ -34,11 +31,24 @@ RSpec.describe RescanProfileJob, type: :job do
       end
     end
 
+    context 'when service fails with non-retryable error' do
+      before do
+        allow(service_class).to receive(:call)
+          .and_return(Failure(error: :not_found, message: "Not found", retryable: false))
+        allow(Rails.logger).to receive(:info)
+        allow(Rails.logger).to receive(:error)
+      end
+
+      it 'does not raise error' do
+        expect { described_class.new.perform(profile.id) }.not_to raise_error
+      end
+    end
+
     context 'when profile does not exist' do
       before { allow(Rails.logger).to receive(:warn) }
 
-      it 'does not call service' do
-        expect(Profiles::RescanService).not_to receive(:call)
+      it 'does not call service and does not raise error' do
+        expect(service_class).not_to receive(:call)
         expect { described_class.new.perform(999_999) }.not_to raise_error
       end
     end

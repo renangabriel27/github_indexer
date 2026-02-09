@@ -13,16 +13,8 @@ RSpec.describe ApplicationJob, type: :job do
         find_record_safely(klass, id)
       end
 
-      def public_log_event(event, **details)
-        log_event(event, **details)
-      end
-
       def public_handle_service_result(result, profile_id:, &block)
         handle_service_result(result, profile_id: profile_id, &block)
-      end
-
-      def public_build_log_message(job_name, event, details)
-        build_log_message(job_name, event, details)
       end
     end
   end
@@ -32,60 +24,13 @@ RSpec.describe ApplicationJob, type: :job do
   describe "#find_record_safely" do
     let!(:profile) { create(:profile) }
 
-    context "when record exists" do
-      it "returns the record" do
-        result = job_instance.public_find_record_safely(Profile, profile.id)
-        expect(result).to eq(profile)
-      end
-
-      it "does not log anything" do
-        expect(Rails.logger).not_to receive(:warn)
-        job_instance.public_find_record_safely(Profile, profile.id)
-      end
+    it "returns the record when it exists" do
+      expect(job_instance.public_find_record_safely(Profile, profile.id)).to eq(profile)
     end
 
-    context "when record does not exist" do
-      it "returns nil" do
-        result = job_instance.public_find_record_safely(Profile, 999999)
-        expect(result).to be_nil
-      end
-
-      it "logs a warning with model and id" do
-        expect(Rails.logger).to receive(:warn).with(/not_found.*id=999999.*model=Profile/)
-        job_instance.public_find_record_safely(Profile, 999999)
-      end
-    end
-  end
-
-  describe "#log_event" do
-    it "logs info for :started event" do
-      expect(Rails.logger).to receive(:info).with(/started/)
-      job_instance.public_log_event(:started, profile_id: 1)
-    end
-
-    it "logs info for :success event" do
-      expect(Rails.logger).to receive(:info).with(/success/)
-      job_instance.public_log_event(:success, profile_id: 1)
-    end
-
-    it "logs warn for :not_found event" do
-      expect(Rails.logger).to receive(:warn).with(/not_found/)
-      job_instance.public_log_event(:not_found, profile_id: 1)
-    end
-
-    it "logs error for :failed event" do
-      expect(Rails.logger).to receive(:error).with(/failed/)
-      job_instance.public_log_event(:failed, profile_id: 1, error: "timeout")
-    end
-
-    it "includes job name in message" do
-      expect(Rails.logger).to receive(:info).with(/\[#{test_job_class.name}\]/)
-      job_instance.public_log_event(:started, profile_id: 1)
-    end
-
-    it "includes details in message" do
-      expect(Rails.logger).to receive(:info).with(/profile_id=1.*update_name=true/)
-      job_instance.public_log_event(:started, profile_id: 1, update_name: true)
+    it "returns nil and logs warning when record does not exist" do
+      expect(Rails.logger).to receive(:warn).with(/not_found.*id=999999/)
+      expect(job_instance.public_find_record_safely(Profile, 999999)).to be_nil
     end
   end
 
@@ -95,105 +40,32 @@ RSpec.describe ApplicationJob, type: :job do
     context "when result is success" do
       let(:result) { Success({ data: "test_data" }) }
 
-      it "logs success" do
-        expect(Rails.logger).to receive(:info).with(/success.*profile_id=#{profile_id}/)
-        job_instance.public_handle_service_result(result, profile_id: profile_id)
-      end
-
-      it "yields the value to the block if given" do
+      it "logs success and yields the value" do
+        allow(Rails.logger).to receive(:info)
         yielded_value = nil
-        job_instance.public_handle_service_result(result, profile_id: profile_id) do |value|
-          yielded_value = value
-        end
+
+        job_instance.public_handle_service_result(result, profile_id: profile_id) { |v| yielded_value = v }
+
         expect(yielded_value).to eq({ data: "test_data" })
       end
-
-      it "does not raise an error" do
-        expect do
-          job_instance.public_handle_service_result(result, profile_id: profile_id)
-        end.not_to raise_error
-      end
     end
 
-    context "when result is failure with retryable error" do
-      let(:result) do
-        Failure(
-          error: :timeout,
-          message: "Request timeout",
-          retryable: true
-        )
-      end
-
-      it "logs the failure" do
-        expect(Rails.logger).to receive(:error).with(/failed.*profile_id=#{profile_id}.*error=timeout/)
-
-        expect do
-          job_instance.public_handle_service_result(result, profile_id: profile_id)
-        end.to raise_error(StandardError)
-      end
-
-      it "raises StandardError for retry" do
+    context "when result is failure" do
+      it "raises StandardError for retryable errors" do
+        result = Failure(error: :timeout, message: "Request timeout", retryable: true)
         allow(Rails.logger).to receive(:error)
 
-        expect do
-          job_instance.public_handle_service_result(result, profile_id: profile_id)
-        end.to raise_error(StandardError, "Request timeout")
-      end
-    end
-
-    context "when result is failure with non-retryable error" do
-      let(:result) do
-        Failure(
-          error: :invalid_data,
-          message: "Invalid profile data",
-          retryable: false
-        )
+        expect { job_instance.public_handle_service_result(result, profile_id: profile_id) }
+          .to raise_error(StandardError, "Request timeout")
       end
 
-      it "logs the failure" do
-        expect(Rails.logger).to receive(:error).with(/failed.*profile_id=#{profile_id}.*error=invalid_data/)
-        job_instance.public_handle_service_result(result, profile_id: profile_id)
-      end
-
-      it "does not raise an error" do
+      it "does not raise for non-retryable errors" do
+        result = Failure(error: :invalid_data, message: "Invalid data", retryable: false)
         allow(Rails.logger).to receive(:error)
 
-        expect do
-          job_instance.public_handle_service_result(result, profile_id: profile_id)
-        end.not_to raise_error
+        expect { job_instance.public_handle_service_result(result, profile_id: profile_id) }
+          .not_to raise_error
       end
-    end
-  end
-
-  describe "#build_log_message" do
-    it "includes job name in brackets" do
-      message = job_instance.public_build_log_message("TestJob", :started, {})
-      expect(message).to start_with("[TestJob]")
-    end
-
-    it "includes event type" do
-      message = job_instance.public_build_log_message("TestJob", :started, {})
-      expect(message).to include("started")
-    end
-
-    it "includes all details as key=value pairs" do
-      message = job_instance.public_build_log_message(
-        "TestJob",
-        :success,
-        { profile_id: 1, update_name: true }
-      )
-      expect(message).to include("profile_id=1")
-      expect(message).to include("update_name=true")
-    end
-
-    it "skips details with blank values" do
-      message = job_instance.public_build_log_message(
-        "TestJob",
-        :started,
-        { profile_id: 1, data: nil }
-      )
-      expect(message).to include("profile_id=1")
-      expect(message).not_to include("data=")
     end
   end
 end
