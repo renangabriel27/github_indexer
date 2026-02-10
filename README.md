@@ -44,7 +44,7 @@ Uma ferramenta para indexação e busca de perfis do GitHub.
 - **Encurtamento de URLs**: Integração com Short.io para encurtamento de URLs
 - **Processamento Assíncrono**: Jobs em background com Sidekiq + Redis
 - **API RESTful**: Endpoints versionados com serialização otimizada
-- **Rate Limiting**: Proteção contra abuso da API (100 req/min)
+- **Rate Limiting**: Proteção contra abuso da API (100 req/hora)
 - **Interface Responsiva**: Interface moderna com TailwindCSS e ViewComponents
 
 ## 🛠️ Stack Tecnológica
@@ -154,7 +154,7 @@ curl -X GET "http://localhost:3000/api/v1/profiles/1" \
 
 ### 🛡️ Rate Limiting
 
-- **Limite**: 100 requisições por minuto por IP
+- **Limite**: 100 requisições por hora por IP (50 req/hora para buscas)
 - **Headers**: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
 - **Excedido**: Retorna 429 Too Many Requests
 
