@@ -478,9 +478,7 @@ bundle exec rspec spec/services/profiles/github/scraper_service_spec.rb -f d
 
 
 ### Scraping
-- **Circuit Breaker** ✅: Implementado para proteger contra falhas consecutivas do GitHub (fecha após 5 falhas, tenta novamente após 60s)
 - **API do GitHub**: Migrar para API oficial do GitHub para dados mais confiáveis (requer autenticação para 5000 req/h)
-- **Fallback Strategy**: Implementar fallback automático API → Scraping em caso de falha
 - **Health Monitoring**: Sistema de alertas quando seletores CSS falharem
 - **Cache Inteligente**: Cachear dados de perfis com TTL configurável para reduzir scraping
 
