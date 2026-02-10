@@ -9,6 +9,8 @@
 
 Uma ferramenta para indexação e busca de perfis do GitHub.
 
+![Lista de Perfis](public/screenshots/profile-list.png)
+
 ## 📋 Sumário
 
 - [✨ Funcionalidades](#-funcionalidades)
@@ -29,14 +31,11 @@ Uma ferramenta para indexação e busca de perfis do GitHub.
 
 ## 📸 Screenshots
 
-### Lista de Perfis
-![Lista de Perfis](public/screenshots/profile-list.png)
-
 ### Detalhes do Perfil
 ![Detalhes do Perfil](public/screenshots/profile-detail.png)
 
 ### Progresso de Scraping
-![Progresso de Scraping](public/screenshots/profile-progress.png)
+![Progresso de Scraping](public/screenshots/profile-new.gif)
 
 ## ✨ Funcionalidades
 
