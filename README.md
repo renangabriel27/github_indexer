@@ -39,7 +39,7 @@ Uma ferramenta para indexação e busca de perfis do GitHub.
 
 ## ✨ Funcionalidades
 
-- **Gerenciamento de Perfis**: Cadastre, indexe, busque e gerencie perfis do GitHub
+- **Gerenciamento de Perfis**: Cadastre, busque e gerencie perfis do GitHub
 - **Web Scraping**: Extração automática usando Chrome headless (Ferrum) com suporte a retry
 - **Encurtamento de URLs**: Integração com Short.io para encurtamento de URLs
 - **Processamento Assíncrono**: Jobs em background com Sidekiq + Redis
