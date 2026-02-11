@@ -6,6 +6,10 @@ Sidekiq::Web.use Rack::Auth::Basic do |username, password|
 end
 
 Rails.application.routes.draw do
+  # Health check endpoint for Railway
+  get "/health", to: "health#show"
+  get "/up", to: "health#show"
+
   mount Rswag::Ui::Engine => "/api-docs"
   mount Rswag::Api::Engine => "/api-docs"
   mount Sidekiq::Web => "/sidekiq"
