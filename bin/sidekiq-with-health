@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+require "socket"
+
+port = ENV.fetch("PORT", 3000).to_i
+
+Thread.new do
+  server = TCPServer.new("0.0.0.0", port)
+  puts "Health check server started on port #{port}"
+  loop do
+    client = server.accept
+    client.gets
+    client.print "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n{\"status\":\"ok\"}"
+    client.close
+  rescue => e
+    puts "Health check error: #{e.message}"
+  end
+end
+
+exec("bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml")
